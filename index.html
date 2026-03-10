@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trung Tâm Học Tập Của Bé</title>
+    <!-- Font chữ vui nhộn -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f9ff;
+            --primary: #0369a1;
+            --card-hover: #e0f2fe;
+        }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .menu {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 3px solid transparent;
+        }
+        .card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            border-color: #7dd3fc;
+            background: var(--card-hover);
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #334155;
+        }
+        .sub {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌟 Chào mừng bé đến với thế giới học tập! 🌟</h1>
+    <div class="menu">
+        <a href="./BangCuuChuong/" class="card">
+            <div class="icon">🔢</div>
+            <div class="name">Toán Học</div>
+            <div class="sub">Bảng cửu chương nhân & chia</div>
+        </a>
+        <a href="./TiengAnh/" class="card">
+            <div class="icon">🇬🇧</div>
+            <div class="name">Tiếng Anh</div>
+            <div class="sub">Học từ vựng qua hình ảnh</div>
+        </a>
+    </div>
+</body>
+</html>
