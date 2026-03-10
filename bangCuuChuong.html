@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Tập Bảng Cửu Chương</title>
+    <!-- Google Fonts cho thiết kế chữ hiện đại -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --bg-gradient-end: #e2e8f0;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #3b82f6;
+            --accent: #d946ef;
+            --success: #10b981;
+            --error: #ef4444;
+            --text-main: #334155;
+            --text-title: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: #f8fafc;
+            --numpad-bg: #f8fafc;
+            --numpad-hover: #e2e8f0;
+            --border-radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Tránh bôi đen khi bấm nhanh */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- Header & Controls --- */
+        .header {
+            padding: 24px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.015);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .title-row h1 {
+            font-family: 'Nunito', sans-serif;
+            font-size: 24px;
+            background: linear-gradient(100deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .reset-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reset-btn:hover {
+            background: var(--error);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .reset-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* --- Mode Switcher --- */
+        .mode-switcher {
+            display: flex;
+            background: var(--numpad-bg);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        /* --- Table Selector --- */
+        .table-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .table-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #2dd4bf; /* Default placeholder, overriden later */
+            border: 2px solid transparent;
+            color: white;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* Distinct vibrant colors for numbers */
+        .table-btn[data-num="2"] { background: #f43f5e; box-shadow: 0 4px 10px rgba(244, 63, 94, 0.2); }
+        .table-btn[data-num="3"] { background: #f97316; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.2); }
+        .table-btn[data-num="4"] { background: #eab308; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.2); }
+        .table-btn[data-num="5"] { background: #22c55e; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); }
+        .table-btn[data-num="6"] { background: #06b6d4; box-shadow: 0 4px 10px rgba(6, 182, 212, 0.2); }
+        .table-btn[data-num="7"] { background: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
+        .table-btn[data-num="8"] { background: #8b5cf6; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2); }
+        .table-btn[data-num="9"] { background: #d946ef; box-shadow: 0 4px 10px rgba(217, 70, 239, 0.2); }
+
+        .table-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .table-btn.active {
+            transform: scale(1.15);
+            border: 2px solid var(--text-title);
+            z-index: 2;
+        }
+
+        .table-btn.completed::after {
+            content: '✓';
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background: var(--success);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table-btn.locked {
+            filter: grayscale(0.8) opacity(0.5);
+            box-shadow: none;
+        }
+        .table-btn.locked:hover {
+            transform: none;
+        }
+
+
+        /* --- Play Area --- */
+        .play-area {
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            transition: all 0.3s;
+        }
+
+        .dot.filled.correct {
+            background: var(--success);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        .dot.filled.wrong {
+            background: var(--error);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        .question-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            min-height: 80px;
+        }
+
+        .question-text {
+            color: var(--text-title);
+        }
+
+        .answer-input {
+            width: 100px;
+            height: 70px;
+            background: var(--input-bg);
+            border: 3px solid #e2e8f0;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+
+        .answer-input.active {
+            border-color: var(--primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        .answer-input.correct {
+            border-color: var(--success);
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+            transform: scale(1.05);
+        }
+
+        .answer-input.wrong {
+            border-color: var(--error);
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* --- Numpad --- */
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.015);
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .num-btn {
+            background: var(--card-bg);
+            color: var(--text-title);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 16px;
+            padding: 16px 0;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+        }
+
+        .num-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(0,0,0,0.05);
+            background: var(--numpad-hover);
+        }
+        
+        .num-btn:hover {
+            background: var(--input-bg);
+        }
+
+        .num-btn.delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border-color: transparent;
+        }
+        
+        .num-btn.delete:active {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .num-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .num-btn.clear {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border-color: transparent;
+        }
+        
+        .num-btn.clear:active {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .num-btn.clear:hover {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .submit-btn {
+            grid-column: span 3;
+            background: var(--primary);
+            color: white;
+            padding: 16px 0;
+            font-size: 20px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 0 rgba(79, 70, 229, 0.4);
+            transition: all 0.1s;
+        }
+
+        .submit-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(0,0,0,0.1);
+            background: var(--primary-hover);
+        }
+
+        /* Màn hình thông báo hoàn thành bảng */
+        .congrats-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .congrats-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .congrats-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+
+        .congrats-text {
+            font-size: 28px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            color: var(--success);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .congrats-subtext {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .next-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+            transition: all 0.2s;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            background: var(--primary-hover);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Tối ưu màn hình nhỏ */
+        @media (max-width: 400px) {
+            .table-btn { width: 36px; height: 36px; font-size: 16px; }
+            .question-text { font-size: 44px; }
+            .answer-input { width: 80px; height: 60px; font-size: 36px; }
+            .num-btn { padding: 12px 0; font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="title-row">
+            <h1>Cửu Chương</h1>
+            <button class="reset-btn" onclick="resetAllData()" title="Xóa dữ liệu tiến độ">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                </svg>
+                Làm lại
+            </button>
+        </div>
+
+        <div class="mode-switcher">
+            <button class="mode-btn active" id="btn-multiply" onclick="setMode('multiply')">Phép Nhân (×)</button>
+            <button class="mode-btn" id="btn-divide" onclick="setMode('divide')">Phép Chia (÷)</button>
+        </div>
+
+        <div class="table-selector" id="table-selector">
+            <!-- Buttons 2-9 will be generated by JS -->
+        </div>
+    </div>
+
+    <div class="play-area">
+        <div class="progress-dots" id="progress-dots">
+            <!-- 10 dots will be generated -->
+        </div>
+
+        <div class="question-box">
+            <span class="question-text" id="question-text">2 × 3 =</span>
+            <div class="answer-input" id="answer-input"></div>
+        </div>
+    </div>
+
+    <div class="numpad">
+        <button class="num-btn" onclick="pressNum(1)">1</button>
+        <button class="num-btn" onclick="pressNum(2)">2</button>
+        <button class="num-btn" onclick="pressNum(3)">3</button>
+        <button class="num-btn" onclick="pressNum(4)">4</button>
+        <button class="num-btn" onclick="pressNum(5)">5</button>
+        <button class="num-btn" onclick="pressNum(6)">6</button>
+        <button class="num-btn" onclick="pressNum(7)">7</button>
+        <button class="num-btn" onclick="pressNum(8)">8</button>
+        <button class="num-btn" onclick="pressNum(9)">9</button>
+        <button class="num-btn clear" onclick="clearAnswer()">C</button>
+        <button class="num-btn" onclick="pressNum(0)">0</button>
+        <button class="num-btn delete" onclick="deleteNum()">⌫</button>
+        <button class="submit-btn" onclick="checkAnswer()">Nộp Bài</button>
+    </div>
+
+    <div class="congrats-overlay" id="congrats-overlay">
+        <div class="congrats-icon">🏆</div>
+        <div class="congrats-text" id="congrats-title">Tuyệt vời!</div>
+        <div class="congrats-subtext">Bạn đã hoàn thành bảng này.</div>
+        <button class="next-btn" onclick="nextTable()">Học Bảng Tiếp Theo</button>
+    </div>
+</div>
+
+<script>
+    // --- State Application ---
+    const state = {
+        mode: 'multiply', // 'multiply' or 'divide'
+        currentTable: 2,
+        learningProgress: 0, // 0 to 10
+        questions: [], // Array of multipliers 1-10 shuffled
+        currentQuestionIndex: 0,
+        currentAnswer: '',
+        expectedAnswer: 0,
+        mistakesThisSession: [], // Bổ sung mảng lưu các câu sai
+        questionResults: [], // Lưu trạng thái câu đúng đầu tiên hay sai
+        // Dữ liệu bảng hoàn thành, lưu vào localStorage
+        tableProgress: {
+            multiply: { 2:false, 3:false, 4:false, 5:false, 6:false, 7:false, 8:false, 9:false },
+            divide: { 2:false, 3:false, 4:false, 5:false, 6:false, 7:false, 8:false, 9:false }
+        }
+    };
+
+    // --- Khởi tạo ---
+    function init() {
+        loadData();
+        renderTableButtons();
+        renderDots();
+        startTable(state.currentTable);
+    }
+
+    // --- LocalStorage ---
+    function loadData() {
+        const saved = localStorage.getItem('cuuChuongProgress');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                state.tableProgress = parsed;
+            } catch (e) {
+                console.error("Lỗi đọc dữ liệu lưu trữ", e);
+            }
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('cuuChuongProgress', JSON.stringify(state.tableProgress));
+    }
+
+    function resetAllData() {
+        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử học tập và làm lại từ đầu?")) {
+            state.tableProgress = {
+                multiply: { 2:false, 3:false, 4:false, 5:false, 6:false, 7:false, 8:false, 9:false },
+                divide: { 2:false, 3:false, 4:false, 5:false, 6:false, 7:false, 8:false, 9:false }
+            };
+            saveData();
+            state.mode = 'multiply';
+            document.getElementById('btn-multiply').classList.add('active');
+            document.getElementById('btn-divide').classList.remove('active');
+            renderTableButtons();
+            startTable(2);
+        }
+    }
+
+    // --- Render Giao diện ---
+    function renderTableButtons() {
+        const container = document.getElementById('table-selector');
+        container.innerHTML = '';
+        
+        for (let i = 2; i <= 9; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'table-btn';
+            btn.dataset.num = i;
+            btn.innerText = i;
+            
+            if (i === state.currentTable) {
+                btn.classList.add('active');
+            }
+            
+            // Hiện dấu v nếu đã hoàn thành ở chế độ hiện tại
+            if (state.tableProgress[state.mode][i]) {
+                btn.classList.add('completed');
+            }
+
+            btn.onclick = () => {
+                startTable(i);
+            };
+            
+            container.appendChild(btn);
+        }
+    }
+
+    function renderDots() {
+        const container = document.getElementById('progress-dots');
+        container.innerHTML = '';
+        for (let i = 0; i < 10; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            
+            if (i < state.learningProgress) {
+                // Các câu đã vượt qua
+                dot.classList.add('filled');
+                if (state.questionResults[i] === 'wrong') {
+                    dot.classList.add('wrong');
+                } else {
+                    dot.classList.add('correct');
+                }
+            } else if (i === state.learningProgress) {
+                // Câu đang làm hiện tại
+                if (state.questionResults[i] === 'wrong') {
+                    dot.classList.add('filled');
+                    dot.classList.add('wrong');
+                }
+            }
+            
+            container.appendChild(dot);
+        }
+    }
+
+    // --- Logic Chuyển Mode / Bảng ---
+    function setMode(mode) {
+        if (state.mode === mode) return;
+        state.mode = mode;
+        
+        document.getElementById('btn-multiply').classList.toggle('active', mode === 'multiply');
+        document.getElementById('btn-divide').classList.toggle('active', mode === 'divide');
+        
+        renderTableButtons();
+        startTable(state.currentTable);
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startTable(tableNum) {
+        state.currentTable = tableNum;
+        state.learningProgress = 0;
+        state.currentQuestionIndex = 0;
+        state.mistakesThisSession = []; // Reset mảng câu sai
+        state.questionResults = Array(10).fill('correct'); // Mặc định chấm màu xanh
+        
+        // Cập nhật UI nút
+        document.querySelectorAll('.table-btn').forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.num) === tableNum);
+        });
+
+        // Tạo bộ 10 câu hỏi ngẫu nhiên từ 1 đến 10
+        state.questions = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        
+        renderDots();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const num2 = state.questions[state.currentQuestionIndex];
+        const num1 = state.currentTable;
+        
+        const qText = document.getElementById('question-text');
+        const input = document.getElementById('answer-input');
+        
+        input.innerText = '';
+        state.currentAnswer = '';
+        input.className = 'answer-input active';
+        
+        if (state.mode === 'multiply') {
+            qText.innerHTML = `${num1} × ${num2} =`;
+            state.expectedAnswer = num1 * num2;
+        } else {
+            // Với phép chia, ví dụ bảng 2: 2, 4, 6... 20 chia 2
+            const dividend = num1 * num2;
+            qText.innerHTML = `${dividend} ÷ ${num1} =`;
+            state.expectedAnswer = num2;
+        }
+    }
+
+    // --- Tương tác Numpad ---
+    function pressNum(num) {
+        // Giới hạn max độ dài đáp án (ví dụ: 90) -> max 3 char
+        if (state.currentAnswer.length >= 3) return;
+        
+        state.currentAnswer += num.toString();
+        updateInputDisplay();
+    }
+
+    function deleteNum() {
+        if (state.currentAnswer.length > 0) {
+            state.currentAnswer = state.currentAnswer.slice(0, -1);
+            updateInputDisplay();
+        }
+    }
+
+    function clearAnswer() {
+        state.currentAnswer = '';
+        updateInputDisplay();
+    }
+
+    function updateInputDisplay() {
+        const input = document.getElementById('answer-input');
+        input.innerText = state.currentAnswer;
+        input.classList.remove('wrong');
+    }
+
+    // --- Kiểm Tra Đáp Án Cốt Lõi ---
+    let isTransitioning = false; // Ngăn bấm thêm khi đang chuyển câu
+
+    function checkAnswer() {
+        if (state.currentAnswer === '' || isTransitioning) return;
+        
+        const intAns = parseInt(state.currentAnswer);
+        const inputEl = document.getElementById('answer-input');
+        
+        if (intAns === state.expectedAnswer) {
+            // ĐÚNG
+            isTransitioning = true;
+            inputEl.className = 'answer-input correct';
+            
+            setTimeout(() => {
+                handleCorrect();
+            }, 400); // Đợi 0.4s khoe màu xanh r chuyển
+        } else {
+            // SAI
+            inputEl.className = 'answer-input wrong';
+            state.questionResults[state.currentQuestionIndex] = 'wrong'; // Đánh dấu điểm này là sai
+            renderDots(); // Cập nhật thanh tiến độ lập tức để hiện màu đỏ
+            
+            // Ghi nhận mảng lỗi
+            const num1 = state.currentTable;
+            const num2 = state.questions[state.currentQuestionIndex];
+            let mistakeStr = state.mode === 'multiply' 
+                ? `${num1} × ${num2} = ${state.expectedAnswer} (Bạn nhập: ${intAns})`
+                : `${num1 * num2} ÷ ${num1} = ${state.expectedAnswer} (Bạn nhập: ${intAns})`;
+                
+            if (!state.mistakesThisSession.includes(mistakeStr)) {
+                state.mistakesThisSession.push(mistakeStr);
+            }
+
+            // Tự động chuyển câu sau hiệu ứng rung/màu đỏ
+            isTransitioning = true;
+            setTimeout(() => {
+                handleCorrect();
+            }, 800); 
+        }
+    }
+
+    function handleCorrect() {
+        state.learningProgress++;
+        renderDots();
+        
+        if (state.learningProgress >= 10) {
+            // Hoàn thành 1 bảng
+            finishTable();
+        } else {
+            // Chuyển câu tiếp
+            state.currentQuestionIndex++;
+            loadQuestion();
+            isTransitioning = false;
+        }
+    }
+
+    function finishTable() {
+        const titleEl = document.getElementById('congrats-title');
+        const subtextEl = document.querySelector('.congrats-subtext');
+
+        if (state.mistakesThisSession.length === 0) {
+            // Lưu tiến độ bảng nếu không sai câu nào
+            state.tableProgress[state.mode][state.currentTable] = true;
+            saveData();
+            renderTableButtons(); // Cập nhật lại dấu tick
+            
+            titleEl.innerText = 'Tuyệt vời!';
+            titleEl.style.color = 'var(--success)';
+            subtextEl.innerHTML = `Bạn đã hoàn thành bảng ${state.currentTable} ${state.mode === 'multiply' ? 'Nhân' : 'Chia'} không chệch nhịp nào.`;
+        } else {
+            titleEl.innerText = 'Chưa hoàn thành';
+            titleEl.style.color = 'var(--error)';
+            
+            let htmlStr = `Bạn đã giải sai <b>${state.mistakesThisSession.length}</b> câu nên tiến độ không được xác nhận. Hãy làm lại cẩn thận hơn nhé:<br>`;
+            htmlStr += `<ul style="text-align: left; background: var(--input-bg); padding: 10px 20px 10px 30px; border-radius: 8px; margin-top: 10px; font-size: 14px; list-style-type: disc;">`;
+            state.mistakesThisSession.forEach(err => {
+                htmlStr += `<li style="margin-bottom:6px;">${err}</li>`;
+            });
+            htmlStr += `</ul>`;
+            subtextEl.innerHTML = htmlStr;
+        }
+
+        document.getElementById('congrats-overlay').classList.add('show');
+    }
+
+    function nextTable() {
+        document.getElementById('congrats-overlay').classList.remove('show');
+        isTransitioning = false;
+        
+        // Tìm bảng chưa học tiếp theo (từ 2 đến 9)
+        let nextTarget = 2;
+        let found = false;
+        
+        for (let i = state.currentTable + 1; i <= 9; i++) {
+            if (!state.tableProgress[state.mode][i]) {
+                nextTarget = i;
+                found = true;
+                break;
+            }
+        }
+        
+        // Nếu đã hoàn thành từ bảng hiện tại đến bảng 9, thì tìm lại từ bảng 2
+        if (!found) {
+            for (let i = 2; i <= 9; i++) {
+                if (!state.tableProgress[state.mode][i]) {
+                    nextTarget = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        
+        // Nếu tất cả đã hoàn thành
+        if (!found) {
+            nextTarget = state.currentTable; // ở lại bài cũ
+            alert("Chúc mừng! Bạn đã hoàn thành toàn bộ bảng cửu chương ở chế độ này!");
+        }
+        
+        startTable(nextTarget);
+    }
+
+    // Bắt support cả phím thực của máy tính
+    document.addEventListener('keydown', (e) => {
+        if (isTransitioning) return;
+        if (e.key >= '0' && e.key <= '9') {
+            pressNum(e.key);
+        } else if (e.key === 'Backspace') {
+            deleteNum();
+        } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
+            clearAnswer();
+        } else if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    // Run
+    init();
+
+</script>
+</body>
+</html>
