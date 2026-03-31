@@ -282,12 +282,20 @@ function startTable(tableNum) {
 }
 
 function loadQuestion() {
+    const qBox = document.querySelector('.question-box');
     const qText = document.getElementById('question-text');
     const input = document.getElementById('answer-input');
     
     input.innerText = '';
     state.currentAnswer = '';
     input.className = 'answer-input active';
+    
+    // Check if the expression is likely to be long
+    if ((state.mode === 'add' || state.mode === 'subtract') && state.config.digits >= 4) {
+        qBox.classList.add('long-expr');
+    } else {
+        qBox.classList.remove('long-expr');
+    }
     
     if (state.mode === 'multiply' || state.mode === 'divide') {
         const num2 = state.questions[state.currentQuestionIndex];
