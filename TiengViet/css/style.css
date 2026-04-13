@@ -1,0 +1,34 @@
+/* Tùy chỉnh CSS thêm ngoài Tailwind */
+
+/* Hiệu ứng nổi bọt ngộ nghĩnh */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Xóa viền tap outline trên các thiết bị cảm ứng / touch */
+button {
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
+}
+
+/* Hiệu ứng nhảy cho progress bar ở báo cáo */
+.progress-bar-fill {
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Bảng giải thích / popup mượt mà hơn */
+#explanation-box {
+    transition: all 0.3s ease-in-out;
+}

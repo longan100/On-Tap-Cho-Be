@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Chủ - Đọc Hiểu Vui</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <script src="js/storage.js"></script>
+  <script>
+    // Kiểm tra chẩn đoán, nếu chưa thì bắt buộc sang trang chẩn đoán
+    const data = StorageManager.getData();
+    if (data.trang_thai !== 'da_chan_doan') {
+        window.location.href = 'chan-doan.html';
+    }
+  </script>
+
+  <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-8 text-center relative overflow-hidden">
+    <!-- Deco -->
+    <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-100 rounded-full opacity-50 z-0"></div>
+    <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-100 rounded-full opacity-50 z-0"></div>
+
+    <div class="relative z-10">
+      <div class="text-6xl mb-2 animate-float">📚</div>
+      <h1 class="text-4xl font-extrabold text-blue-600 mb-2">Đọc Hiểu Vui</h1>
+      <p class="text-gray-600 mb-8 font-medium">Học mỗi ngày một chút, tiến bộ bay xa!</p>
+
+      <div class="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-4 mb-8 shadow-sm flex items-center justify-center gap-3">
+         <span class="text-3xl">🔥</span>
+         <div>
+            <div class="text-sm text-yellow-800 font-bold uppercase tracking-wide">Chuỗi ngày học</div>
+            <div class="text-2xl font-black text-orange-600">
+               <script>document.write(data.streak.current || 0)</script> ngày
+            </div>
+         </div>
+      </div>
+
+      <div class="flex flex-col gap-4">
+          <a href="hoc.html" class="w-full py-4 bg-blue-500 text-white text-2xl font-bold rounded-2xl shadow-lg hover:bg-blue-600 transition-transform transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+              <span>🚀</span> Học Hôm Nay
+          </a>
+          
+          <a href="bao-cao.html" class="w-full py-3 bg-purple-100 text-purple-700 text-xl font-bold rounded-2xl border-2 border-purple-200 hover:bg-purple-200 transition-transform transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+              <span>📊</span> Xem Báo Cáo Của Bé
+          </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khởi động - Đọc Hiểu Vui</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <!-- Màn Welcome/Giải thích trc khi làm test -->
+  <div id="welcome-screen" class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-8 text-center">
+    <div class="text-6xl mb-4">🚀</div>
+    <h1 class="text-3xl font-extrabold text-blue-600 mb-4">Chào mừng bé!</h1>
+    <p class="text-lg text-gray-700 mb-6">Trước khi bắt đầu hành trình, chúng ta hãy làm nóng với 8 câu hỏi nhỏ nhé. Cứ trả lời theo những gì bé nghĩ!</p>
+    <button onclick="startDiagnosis()" class="w-full py-4 bg-purple-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-purple-600 transition-transform transform hover:scale-105">
+      Bắt đầu ngay
+    </button>
+  </div>
+
+  <div id="loading" class="hidden text-xl font-bold text-gray-500">Đang tải câu hỏi...</div>
+
+  <div id="game-container" class="hidden w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-6 relative">
+    <div class="flex justify-between items-center mb-6">
+      <div class="text-lg font-bold text-gray-600">Câu <span id="current-q-index" class="text-purple-500 text-2xl">1</span> / 8</div>
+      <div class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-sm font-semibold">Khởi động</div>
+    </div>
+
+    <div class="mb-6">
+      <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 shadow-sm text-lg text-gray-800 leading-relaxed mb-6">
+        <p id="doan-van"></p>
+      </div>
+      <h2 id="cau-hoi" class="text-xl font-extrabold text-gray-900 mb-4"></h2>
+      <div id="options-container" class="flex flex-col gap-3"></div>
+    </div>
+  </div>
+
+  <script src="data/questions.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/chan_doan.js"></script>
+</body>
+</html>
