@@ -229,6 +229,18 @@ body {
     color: var(--text-title);
 }
 
+.answer-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#remainder-label {
+    font-size: 28px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
 .answer-input {
     min-width: 100px;
     padding: 0 16px;
@@ -319,6 +331,20 @@ body {
     background: rgba(239, 68, 68, 0.15);
 }
 
+.num-btn.action-r {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border-color: transparent;
+}
+
+.num-btn.action-r:active {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.num-btn.action-r:hover {
+    background: rgba(16, 185, 129, 0.15);
+}
+
 .num-btn.clear {
     background: rgba(245, 158, 11, 0.1);
     color: #d97706;
@@ -346,6 +372,10 @@ body {
     border-radius: 16px;
     box-shadow: 0 4px 0 rgba(79, 70, 229, 0.4);
     transition: all 0.1s;
+}
+
+.submit-btn.span-2 {
+    grid-column: span 2;
 }
 
 .submit-btn:active {
@@ -452,7 +482,7 @@ body {
 }
 
 #app-wrapper.toolbox-open {
-    max-width: 780px !important;
+    max-width: 840px !important;
 }
 
 #toolbox {
@@ -472,7 +502,7 @@ body {
 }
 
 #app-wrapper.toolbox-open #toolbox {
-    width: 300px;
+    width: 360px;
     border-right-width: 1px;
 }
 

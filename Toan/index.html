@@ -68,11 +68,13 @@
             </button>
         </div>
 
-        <div class="mode-switcher">
-            <button class="mode-btn active" id="btn-multiply" onclick="setMode('multiply')">Nhân (×)</button>
-            <button class="mode-btn" id="btn-divide" onclick="setMode('divide')">Chia (÷)</button>
-            <button class="mode-btn" id="btn-add" onclick="setMode('add')">Cộng (+)</button>
-            <button class="mode-btn" id="btn-subtract" onclick="setMode('subtract')">Trừ (-)</button>
+        <div class="mode-switcher" style="flex-wrap: wrap;">
+            <button class="mode-btn active" id="btn-multiply" onclick="setMode('multiply')" style="min-width: 30%;">Bảng Nhân</button>
+            <button class="mode-btn" id="btn-divide" onclick="setMode('divide')" style="min-width: 30%;">Bảng Chia</button>
+            <button class="mode-btn" id="btn-multiply-adv" onclick="setMode('multiply_adv')" style="min-width: 30%;">Nhân (×)</button>
+            <button class="mode-btn" id="btn-divide-adv" onclick="setMode('divide_adv')" style="min-width: 30%;">Chia (÷)</button>
+            <button class="mode-btn" id="btn-add" onclick="setMode('add')" style="min-width: 30%;">Cộng (+)</button>
+            <button class="mode-btn" id="btn-subtract" onclick="setMode('subtract')" style="min-width: 30%;">Trừ (-)</button>
         </div>
 
         <div id="dynamic-selector-area">
@@ -99,7 +101,7 @@
 
                 <div class="flex gap-4 w-full">
                     <div class="flex-1">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Số chữ số</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" id="label-config-digits">Số chữ số</label>
                         <select id="config-digits" class="w-full bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl focus:ring-primary focus:border-primary block p-2.5 outline-none transition-all">
                             <option value="1">1 (vd 5+3)</option>
                             <option value="2" selected>2 (vd 45+12)</option>
@@ -109,7 +111,15 @@
                             <option value="6">6 (tới 999999)</option>
                         </select>
                     </div>
-                    <div class="flex-1">
+                    <div class="flex-1" id="config-division-container" style="display: none;">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chế độ chia</label>
+                        <select id="config-division" class="w-full bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl focus:ring-primary focus:border-primary block p-2.5 outline-none transition-all">
+                            <option value="mixed" selected>Trộn (Hết & Dư)</option>
+                            <option value="exact">Chỉ chia hết</option>
+                            <option value="remainder">Chỉ chia có dư</option>
+                        </select>
+                    </div>
+                    <div class="flex-1" id="config-questions-container">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Số lượng câu</label>
                         <select id="config-questions" class="w-full bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl focus:ring-primary focus:border-primary block p-2.5 outline-none transition-all">
                             <option value="5">5 câu</option>
@@ -138,7 +148,11 @@
 
         <div class="question-box">
             <span class="question-text" id="question-text">2 × 3 =</span>
-            <div class="answer-input" id="answer-input"></div>
+            <div class="answer-wrapper">
+                <div class="answer-input active" id="answer-input" onclick="focusInput('quotient')"></div>
+                <span id="remainder-label" style="display: none;">dư</span>
+                <div class="answer-input" id="answer-remainder" style="display: none;" onclick="focusInput('remainder')"></div>
+            </div>
         </div>
     </div>
 
@@ -155,7 +169,7 @@
         <button class="num-btn clear" onclick="clearAnswer()">C</button>
         <button class="num-btn" onclick="pressNum(0)">0</button>
         <button class="num-btn delete" onclick="deleteNum()">⌫</button>
-        <button class="submit-btn" onclick="checkAnswer()">Nộp Bài</button>
+        <button class="submit-btn" id="btn-submit" onclick="checkAnswer()">Nộp Bài</button>
     </div>
 
     <div class="congrats-overlay" id="congrats-overlay">
