@@ -50,7 +50,7 @@ const questions = [
         id: 7,
         question: "Biển báo giao thông có ý nghĩa gì?",
         image: null,
-        options: ["A. Hướng dẫn ngườvà phương tiện giao thông đúng luật", "B. Làm đồ trang trí", "C. Để chỉ dẫn cho động vật"],
+        options: ["A. Hướng dẫn người và phương tiện giao thông đúng luật", "B. Làm đồ trang trí", "C. Để chỉ dẫn cho động vật"],
         answer: 0
     },
     {
