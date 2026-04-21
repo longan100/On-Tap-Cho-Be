@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn tập Công nghệ lớp 3 - Cuối HK2</title>
+    <link rel="stylesheet" href="quiz_style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ôn tập Công nghệ lớp 3 - Cuối HK2</h1>
+            <p>Chuẩn bị thật tốt cho bài thi của bạn!</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="quiz-screen" id="quizScreen">
+            <div class="quiz-content">
+                <div class="question-counter" id="questionCounter">Câu 1 / 26</div>
+                <div class="question-image" id="questionImage"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="options"></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Câu tiếp theo</button>
+            </div>
+        </div>
+        
+        <div class="result-screen" id="resultScreen">
+            <div class="score-display" id="scoreDisplay"></div>
+            <div class="percentage" id="percentage"></div>
+            <div class="comment" id="comment"></div>
+            <div class="wrong-answers" id="wrongAnswers"></div>
+            <button class="restart-btn" onclick="restartQuiz()">Làm lại</button>
+        </div>
+    </div>
+
+    <script src="quiz_images.js"></script>
+    <script src="quiz_script.js"></script>
+</body>
+</html>
