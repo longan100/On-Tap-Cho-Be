@@ -23,7 +23,13 @@ const state = {
         subtractCount: 0,
         multiplyAdvCount: 0,
         divideAdvCount: 0,
-        quizCount: 0
+        quizCount: 0,
+        opStats: {
+            add: { correct: 0, wrong: 0 },
+            subtract: { correct: 0, wrong: 0 },
+            multiply_adv: { correct: 0, wrong: 0 },
+            divide_adv: { correct: 0, wrong: 0 }
+        }
     },
     sessionAddedCount: 0,
     quizSelectedOps: [],
@@ -77,6 +83,14 @@ function loadData() {
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
+            // Ensure opStats exists with defaults
+            const defaultOpStats = {
+                add: { correct: 0, wrong: 0 },
+                subtract: { correct: 0, wrong: 0 },
+                multiply_adv: { correct: 0, wrong: 0 },
+                divide_adv: { correct: 0, wrong: 0 }
+            };
+            parsed.opStats = { ...defaultOpStats, ...(parsed.opStats || {}) };
             state.tableProgress = { ...state.tableProgress, ...parsed };
         } catch (e) {
             console.error("Lỗi đọc dữ liệu lưu trữ", e);
@@ -107,7 +121,13 @@ function resetAllData() {
                 subtractCount: 0,
                 multiplyAdvCount: 0,
                 divideAdvCount: 0,
-                quizCount: 0
+                quizCount: 0,
+                opStats: {
+                    add: { correct: 0, wrong: 0 },
+                    subtract: { correct: 0, wrong: 0 },
+                    multiply_adv: { correct: 0, wrong: 0 },
+                    divide_adv: { correct: 0, wrong: 0 }
+                }
             };
             state.sessionAddedCount = 0;
             saveData();
@@ -688,6 +708,9 @@ function checkAnswer() {
             state.quizResults[op].correct++;
         }
         
+        // Track opStats for competency table
+        trackOpStat(true);
+        
         setTimeout(() => handleCorrect(), 400);
     } else {
         inputEl.className = 'answer-input wrong';
@@ -698,6 +721,9 @@ function checkAnswer() {
             const op = state.questions[state.currentQuestionIndex].operation;
             state.quizResults[op].wrong++;
         }
+        
+        // Track opStats for competency table
+        trackOpStat(false);
         
         // Track mistakes for table modes (affects table completion check)
         if (state.mode === 'multiply' || state.mode === 'divide') {
@@ -945,6 +971,107 @@ document.addEventListener('keydown', (e) => {
         checkAnswer();
     }
 });
+
+// --- Bảng Năng Lực (Competency Tracking) ---
+
+function trackOpStat(isCorrect) {
+    let opKey = null;
+    
+    if (state.mode === 'add') opKey = 'add';
+    else if (state.mode === 'subtract') opKey = 'subtract';
+    else if (state.mode === 'multiply_adv' || state.mode === 'multiply') opKey = 'multiply_adv';
+    else if (state.mode === 'divide_adv' || state.mode === 'divide') opKey = 'divide_adv';
+    else if (state.mode === 'quiz') {
+        const q = state.questions[state.currentQuestionIndex];
+        if (q) opKey = q.operation;
+    }
+    
+    if (opKey && state.tableProgress.opStats[opKey]) {
+        if (isCorrect) {
+            state.tableProgress.opStats[opKey].correct++;
+        } else {
+            state.tableProgress.opStats[opKey].wrong++;
+        }
+        saveData();
+    }
+}
+
+function openCompetencyModal() {
+    const modal = document.getElementById('competency-modal');
+    renderCompetencyChart();
+    modal.classList.add('show');
+}
+
+function closeCompetencyModal() {
+    const modal = document.getElementById('competency-modal');
+    modal.classList.remove('show');
+}
+
+function renderCompetencyChart() {
+    const container = document.getElementById('competency-content');
+    const opStats = state.tableProgress.opStats;
+    
+    const ops = [
+        { id: 'add', label: 'Cộng', icon: '+', color: '#3b82f6', bg: '#eff6ff' },
+        { id: 'subtract', label: 'Trừ', icon: '−', color: '#f97316', bg: '#fff7ed' },
+        { id: 'multiply_adv', label: 'Nhân', icon: '×', color: '#8b5cf6', bg: '#f5f3ff' },
+        { id: 'divide_adv', label: 'Chia', icon: '÷', color: '#10b981', bg: '#ecfdf5' }
+    ];
+    
+    let totalCorrect = 0;
+    let totalWrong = 0;
+    let html = '';
+    
+    ops.forEach(op => {
+        const stats = opStats[op.id] || { correct: 0, wrong: 0 };
+        const total = stats.correct + stats.wrong;
+        const pct = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
+        totalCorrect += stats.correct;
+        totalWrong += stats.wrong;
+        
+        // Determine level based on percentage
+        let level = '';
+        let levelColor = '';
+        if (total === 0) { level = 'Chưa có dữ liệu'; levelColor = '#94a3b8'; }
+        else if (pct >= 90) { level = 'Xuất sắc'; levelColor = '#10b981'; }
+        else if (pct >= 70) { level = 'Tốt'; levelColor = '#3b82f6'; }
+        else if (pct >= 50) { level = 'Trung bình'; levelColor = '#f59e0b'; }
+        else { level = 'Cần luyện tập'; levelColor = '#ef4444'; }
+        
+        html += `
+        <div class="comp-card">
+            <div class="comp-card-header">
+                <div class="comp-op-badge" style="background:${op.bg};color:${op.color}">
+                    <span class="comp-op-icon">${op.icon}</span>
+                    <span class="comp-op-label">${op.label}</span>
+                </div>
+                <span class="comp-level" style="color:${levelColor}">${level}</span>
+            </div>
+            <div class="comp-bar-track">
+                <div class="comp-bar-correct" style="width:${pct}%;background:${op.color}"></div>
+            </div>
+            <div class="comp-stats-row">
+                <span class="comp-pct" style="color:${op.color}">${pct}%</span>
+                <span class="comp-detail">✓${stats.correct} đúng · ✗${stats.wrong} sai</span>
+            </div>
+        </div>`;
+    });
+    
+    // Summary section
+    const grandTotal = totalCorrect + totalWrong;
+    const grandPct = grandTotal > 0 ? Math.round((totalCorrect / grandTotal) * 100) : 0;
+    
+    html += `
+    <div class="comp-summary">
+        <div class="comp-summary-title">Tổng quan</div>
+        <div class="comp-summary-score">
+            <span class="comp-summary-pct">${grandPct}%</span>
+            <span class="comp-summary-detail">${totalCorrect}/${grandTotal} câu đúng</span>
+        </div>
+    </div>`;
+    
+    container.innerHTML = html;
+}
 
 // Run
 init();

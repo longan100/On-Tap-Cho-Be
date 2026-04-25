@@ -76,6 +76,7 @@
             <button class="mode-btn" id="btn-add" onclick="setMode('add')" style="min-width: 30%;">Cộng (+)</button>
             <button class="mode-btn" id="btn-subtract" onclick="setMode('subtract')" style="min-width: 30%;">Trừ (-)</button>
             <button class="mode-btn" id="btn-quiz" onclick="setMode('quiz')" style="min-width: 100%;">📝 Kiểm Tra</button>
+            <button class="mode-btn comp-btn" onclick="openCompetencyModal()" style="min-width: 100%;background:linear-gradient(135deg,#f59e0b,#ef4444);color:white;">📊 Bảng Năng Lực</button>
         </div>
 
         <div id="dynamic-selector-area">
@@ -239,6 +240,19 @@
         <div class="congrats-subtext">Bạn đã hoàn thành bảng này.</div>
         <div id="quiz-breakdown" style="display: none;"></div>
         <button class="next-btn" onclick="nextTable()">Học Bảng Tiếp Theo</button>
+    </div>
+
+    <!-- Bảng Năng Lực Modal -->
+    <div class="competency-modal" id="competency-modal">
+        <div class="competency-modal-content">
+            <div class="competency-modal-header">
+                <h2 class="competency-modal-title">📊 Bảng Năng Lực</h2>
+                <button class="competency-close-btn" onclick="closeCompetencyModal()">✕</button>
+            </div>
+            <div id="competency-content">
+                <!-- Rendered by renderCompetencyChart() -->
+            </div>
+        </div>
     </div>
     </main>
 </div>
