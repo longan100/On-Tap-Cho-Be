@@ -22,10 +22,20 @@ const state = {
         addCount: 0,
         subtractCount: 0,
         multiplyAdvCount: 0,
-        divideAdvCount: 0
+        divideAdvCount: 0,
+        quizCount: 0
     },
-    sessionAddedCount: 0
+    sessionAddedCount: 0,
+    quizSelectedOps: [],
+    quizResults: {}
 };
+
+const QUIZ_OPERATIONS = [
+  { id: 'add', label: 'Cộng', icon: '+' },
+  { id: 'subtract', label: 'Trừ', icon: '−' },
+  { id: 'multiply_adv', label: 'Nhân', icon: '×' },
+  { id: 'divide_adv', label: 'Chia', icon: '÷' },
+];
 
 // --- Khởi tạo ---
 function init() {
@@ -96,7 +106,8 @@ function resetAllData() {
                 addCount: 0,
                 subtractCount: 0,
                 multiplyAdvCount: 0,
-                divideAdvCount: 0
+                divideAdvCount: 0,
+                quizCount: 0
             };
             state.sessionAddedCount = 0;
             saveData();
@@ -107,6 +118,7 @@ function resetAllData() {
             document.getElementById('btn-divide-adv').classList.remove('active');
             document.getElementById('btn-add').classList.remove('active');
             document.getElementById('btn-subtract').classList.remove('active');
+            document.getElementById('btn-quiz').classList.remove('active');
             renderTableButtons();
             startTable(2);
             
@@ -131,30 +143,51 @@ function getTitle(count) {
 }
 
 function updateMilestoneDisplay() {
-    if (!['add', 'subtract', 'multiply_adv', 'divide_adv'].includes(state.mode)) return;
+    if (!['add', 'subtract', 'multiply_adv', 'divide_adv', 'quiz'].includes(state.mode)) return;
     let count = 0;
     if (state.mode === 'add') count = state.tableProgress.addCount;
     else if (state.mode === 'subtract') count = state.tableProgress.subtractCount;
     else if (state.mode === 'multiply_adv') count = state.tableProgress.multiplyAdvCount || 0;
     else if (state.mode === 'divide_adv') count = state.tableProgress.divideAdvCount || 0;
+    else if (state.mode === 'quiz') count = state.tableProgress.quizCount || 0;
     
     const rank = getTitle(count);
     
-    document.getElementById('milestone-icon').innerText = rank.icon;
-    document.getElementById('milestone-title').innerText = rank.title;
-    document.getElementById('milestone-title').style.color = rank.color;
-    document.getElementById('milestone-count').innerHTML = `${count}<span class="text-[10px] font-bold text-slate-500 ml-0.5">câu</span>`;
+    if (state.mode === 'quiz') {
+        document.getElementById('quiz-milestone-icon').innerText = rank.icon;
+        document.getElementById('quiz-milestone-title').innerText = rank.title;
+        document.getElementById('quiz-milestone-title').style.color = rank.color;
+        document.getElementById('quiz-milestone-count').innerHTML = `${count}<span class="text-[10px] font-bold text-slate-500 ml-0.5">câu</span>`;
+        
+        const badge = document.getElementById('quiz-recent-added-badge');
+        if (badge) {
+            if (state.sessionAddedCount > 0) {
+                badge.innerText = `+${state.sessionAddedCount} hôm nay`;
+                badge.classList.remove('hidden');
+                badge.classList.remove('animate__bounceIn');
+                void badge.offsetWidth;
+                badge.classList.add('animate__bounceIn');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    } else {
+        document.getElementById('milestone-icon').innerText = rank.icon;
+        document.getElementById('milestone-title').innerText = rank.title;
+        document.getElementById('milestone-title').style.color = rank.color;
+        document.getElementById('milestone-count').innerHTML = `${count}<span class="text-[10px] font-bold text-slate-500 ml-0.5">câu</span>`;
 
-    const badge = document.getElementById('recent-added-badge');
-    if (badge) {
-        if (state.sessionAddedCount > 0) {
-            badge.innerText = `+${state.sessionAddedCount} hôm nay`;
-            badge.classList.remove('hidden');
-            badge.classList.remove('animate__bounceIn');
-            void badge.offsetWidth; 
-            badge.classList.add('animate__bounceIn');
-        } else {
-            badge.classList.add('hidden');
+        const badge = document.getElementById('recent-added-badge');
+        if (badge) {
+            if (state.sessionAddedCount > 0) {
+                badge.innerText = `+${state.sessionAddedCount} hôm nay`;
+                badge.classList.remove('hidden');
+                badge.classList.remove('animate__bounceIn');
+                void badge.offsetWidth; 
+                badge.classList.add('animate__bounceIn');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
     }
 }
@@ -190,25 +223,16 @@ function renderTableButtons() {
 function renderDots() {
     const container = document.getElementById('progress-dots');
     container.innerHTML = '';
-    const total = (state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv') ? state.config.totalQuestions : 10;
+    const total = (state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv' || state.mode === 'quiz') ? state.config.totalQuestions : 10;
     
     for (let i = 0; i < total; i++) {
         const dot = document.createElement('div');
         dot.className = 'dot';
         
-        if (i < state.learningProgress) {
-            dot.classList.add('filled');
-            if (state.questionResults[i] === 'wrong') {
-                dot.classList.add('wrong');
-            } else {
-                dot.classList.add('correct');
-            }
-        } else if (i === state.learningProgress) {
-            if (state.questionResults[i] === 'wrong') {
-                dot.classList.add('filled');
-                dot.classList.add('wrong');
-            }
+        if (state.questionResults[i] === 'correct') {
+            dot.classList.add('filled', 'correct');
         }
+        // null/undefined: dot rỗng – chưa làm đúng, phải làm lại
         
         container.appendChild(dot);
     }
@@ -225,10 +249,25 @@ function setMode(mode) {
     document.getElementById('btn-divide-adv').classList.toggle('active', mode === 'divide_adv');
     document.getElementById('btn-add').classList.toggle('active', mode === 'add');
     document.getElementById('btn-subtract').classList.toggle('active', mode === 'subtract');
+    document.getElementById('btn-quiz').classList.toggle('active', mode === 'quiz');
     
-    if (mode === 'add' || mode === 'subtract' || mode === 'multiply_adv' || mode === 'divide_adv') {
+    if (mode === 'quiz') {
+        document.getElementById('table-selector').style.display = 'none';
+        document.getElementById('math-config').style.display = 'none';
+        document.getElementById('quiz-config').style.display = 'block';
+        renderQuizOperations();
+        
+        document.getElementById('progress-dots').innerHTML = '';
+        document.getElementById('question-text').innerHTML = 'Sẵn sàng...';
+        document.getElementById('answer-input').innerText = '';
+        document.getElementById('answer-remainder').innerText = '';
+        document.getElementById('answer-input').classList.remove('active', 'wrong', 'correct');
+        document.getElementById('answer-remainder').classList.remove('active', 'wrong', 'correct');
+        updateMilestoneDisplay();
+    } else if (mode === 'add' || mode === 'subtract' || mode === 'multiply_adv' || mode === 'divide_adv') {
         document.getElementById('table-selector').style.display = 'none';
         document.getElementById('math-config').style.display = 'block';
+        document.getElementById('quiz-config').style.display = 'none';
         
         if (mode === 'divide_adv') {
             document.getElementById('config-division-container').style.display = 'block';
@@ -251,6 +290,7 @@ function setMode(mode) {
     } else {
         document.getElementById('table-selector').style.display = 'flex';
         document.getElementById('math-config').style.display = 'none';
+        document.getElementById('quiz-config').style.display = 'none';
         renderTableButtons();
         startTable(state.currentTable);
     }
@@ -263,7 +303,7 @@ function startMathMode() {
     state.learningProgress = 0;
     state.currentQuestionIndex = 0;
     state.mistakesThisSession = [];
-    state.questionResults = Array(state.config.totalQuestions).fill('correct');
+    state.questionResults = new Array(state.config.totalQuestions).fill(null);
     
     state.questions = [];
     const min = state.config.digits === 1 ? 1 : Math.pow(10, state.config.digits - 1);
@@ -311,6 +351,138 @@ function startMathMode() {
     autoCloseToolboxOnMobile();
 }
 
+function renderQuizOperations() {
+    const grid = document.getElementById('quiz-ops-grid');
+    grid.innerHTML = '';
+    
+    QUIZ_OPERATIONS.forEach(op => {
+        const card = document.createElement('div');
+        card.className = 'quiz-op-card' + (state.quizSelectedOps.includes(op.id) ? ' selected' : '');
+        card.dataset.opId = op.id;
+        card.innerHTML = `<div class="op-icon">${op.icon}</div><span>${op.label}</span>`;
+        card.onclick = () => toggleQuizOp(op.id);
+        grid.appendChild(card);
+    });
+    
+    // Show/hide division mode config
+    const divMode = document.getElementById('quiz-div-mode');
+    if (state.quizSelectedOps.includes('divide_adv')) {
+        divMode.classList.remove('hidden');
+    } else {
+        divMode.classList.add('hidden');
+    }
+}
+
+function toggleQuizOp(opId) {
+    const idx = state.quizSelectedOps.indexOf(opId);
+    if (idx === -1) {
+        state.quizSelectedOps.push(opId);
+    } else {
+        state.quizSelectedOps.splice(idx, 1);
+    }
+    
+    // Update UI
+    document.querySelectorAll('.quiz-op-card').forEach(card => {
+        card.classList.toggle('selected', state.quizSelectedOps.includes(card.dataset.opId));
+    });
+    
+    // Show/hide division mode config
+    const divMode = document.getElementById('quiz-div-mode');
+    if (state.quizSelectedOps.includes('divide_adv')) {
+        divMode.classList.remove('hidden');
+    } else {
+        divMode.classList.add('hidden');
+    }
+}
+
+function startQuizMode() {
+    if (state.quizSelectedOps.length === 0) {
+        Swal.fire({
+            title: 'Chưa chọn phép tính!',
+            text: 'Vui lòng chọn ít nhất 1 phép tính để bắt đầu kiểm tra.',
+            icon: 'warning',
+            confirmButtonColor: '#4f46e5',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    const digits = parseInt(document.getElementById('quiz-digits').value);
+    const totalQuestions = parseInt(document.getElementById('quiz-total').value);
+    const numOps = state.quizSelectedOps.length;
+    const questionsPerOp = Math.floor(totalQuestions / numOps);
+    let remainder = totalQuestions % numOps;
+    
+    const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
+    const max = Math.pow(10, digits) - 1;
+    
+    // Read division type
+    let divType = 'mixed';
+    if (state.quizSelectedOps.includes('divide_adv')) {
+        divType = document.getElementById('quiz-divide-type').value;
+    }
+    
+    state.questions = [];
+    state.quizResults = {};
+    state.quizSelectedOps.forEach(opId => {
+        state.quizResults[opId] = { correct: 0, wrong: 0 };
+        
+        let count = questionsPerOp + (remainder > 0 ? 1 : 0);
+        if (remainder > 0) remainder--;
+        
+        for (let i = 0; i < count; i++) {
+            if (opId === 'multiply_adv') {
+                let n1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                let n2 = Math.floor(Math.random() * 8) + 2;
+                state.questions.push({ n1, n2, operation: 'multiply_adv', expectedAnswer: n1 * n2 });
+            } else if (opId === 'divide_adv') {
+                let n2 = Math.floor(Math.random() * 8) + 2;
+                let n1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                if (n1 < n2) n1 += n2;
+                
+                let isExact = divType === 'exact';
+                if (divType === 'mixed') isExact = Math.random() > 0.5;
+                
+                let rem = n1 % n2;
+                if (isExact && rem !== 0) {
+                    n1 = n1 - rem;
+                    if (n1 < min) n1 += n2;
+                    rem = 0;
+                } else if (!isExact && rem === 0) {
+                    n1 += 1;
+                    if (n1 > max) n1 -= n2;
+                    rem = n1 % n2;
+                }
+                let quotient = Math.floor(n1 / n2);
+                state.questions.push({ n1, n2, operation: 'divide_adv', expectedAnswer: quotient, expectedRemainder: rem });
+            } else if (opId === 'add') {
+                let n1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                let n2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                state.questions.push({ n1, n2, operation: 'add', expectedAnswer: n1 + n2 });
+            } else if (opId === 'subtract') {
+                let n1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                let n2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                if (n1 < n2) { let temp = n1; n1 = n2; n2 = temp; }
+                state.questions.push({ n1, n2, operation: 'subtract', expectedAnswer: n1 - n2 });
+            }
+        }
+    });
+    
+    // Shuffle all questions
+    shuffleArray(state.questions);
+    
+    state.config.digits = digits;
+    state.config.totalQuestions = totalQuestions;
+    state.learningProgress = 0;
+    state.currentQuestionIndex = 0;
+    state.mistakesThisSession = [];
+    state.questionResults = new Array(totalQuestions).fill(null);
+    
+    renderDots();
+    loadQuestion();
+    autoCloseToolboxOnMobile();
+}
+
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -324,7 +496,7 @@ function startTable(tableNum) {
     state.learningProgress = 0;
     state.currentQuestionIndex = 0;
     state.mistakesThisSession = []; 
-    state.questionResults = Array(10).fill('correct'); 
+    state.questionResults = new Array(10).fill(null); 
     
     document.querySelectorAll('.table-btn').forEach(btn => {
         btn.classList.toggle('active', parseInt(btn.dataset.num) === tableNum);
@@ -351,7 +523,7 @@ function loadQuestion() {
     document.getElementById('answer-remainder').className = 'answer-input';
     state.currentRemainder = '';
     
-    if (state.mode === 'divide_adv') {
+    if (state.mode === 'divide_adv' || (state.mode === 'quiz' && state.questions[state.currentQuestionIndex] && state.questions[state.currentQuestionIndex].operation === 'divide_adv')) {
         document.getElementById('remainder-label').style.display = 'inline';
         document.getElementById('answer-remainder').style.display = 'flex';
         state.activeInput = 'quotient';
@@ -363,7 +535,7 @@ function loadQuestion() {
     }
 
     // Check if the expression is likely to be long
-    if ((state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv') && state.config.digits >= 4) {
+    if (((state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv') && state.config.digits >= 4) || (state.mode === 'quiz' && state.config.digits >= 4)) {
         qBox.classList.add('long-expr');
     } else {
         qBox.classList.remove('long-expr');
@@ -380,6 +552,15 @@ function loadQuestion() {
             const dividend = num1 * num2;
             qText.innerHTML = `${dividend} ÷ ${num1} =`;
             state.expectedAnswer = num2;
+        }
+    } else if (state.mode === 'quiz') {
+        const q = state.questions[state.currentQuestionIndex];
+        const opSymbols = { add: '+', subtract: '−', multiply_adv: '×', divide_adv: '÷' };
+        qText.innerHTML = `${q.n1} ${opSymbols[q.operation]} ${q.n2} =`;
+        if (q.operation === 'divide_adv') {
+            state.expectedAnswer = { quotient: q.expectedAnswer, remainder: q.expectedRemainder };
+        } else {
+            state.expectedAnswer = q.expectedAnswer;
         }
     } else if (state.mode === 'multiply_adv') {
         const { num1, num2 } = state.questions[state.currentQuestionIndex];
@@ -402,7 +583,8 @@ function loadQuestion() {
 }
 
 function focusInput(target) {
-    if (state.mode !== 'divide_adv') return;
+    const isDivideMode = state.mode === 'divide_adv' || (state.mode === 'quiz' && state.questions[state.currentQuestionIndex] && state.questions[state.currentQuestionIndex].operation === 'divide_adv');
+    if (!isDivideMode) return;
     state.activeInput = target;
     document.getElementById('answer-input').classList.toggle('active', target === 'quotient');
     document.getElementById('answer-remainder').classList.toggle('active', target === 'remainder');
@@ -421,6 +603,12 @@ function pressNum(num) {
         let maxLen = (state.mode === 'add' || state.mode === 'subtract') ? (state.config.digits + 1) : 3;
         if (state.mode === 'multiply_adv') maxLen = state.config.digits + 2;
         if (state.mode === 'divide_adv') maxLen = state.config.digits + 1;
+        if (state.mode === 'quiz') {
+            const q = state.questions[state.currentQuestionIndex];
+            if (q.operation === 'add' || q.operation === 'subtract') maxLen = state.config.digits + 1;
+            else if (q.operation === 'multiply_adv') maxLen = state.config.digits + 2;
+            else if (q.operation === 'divide_adv') maxLen = state.config.digits + 1;
+        }
         
         if (state.currentAnswer.length >= maxLen) return;
         state.currentAnswer += num.toString();
@@ -456,7 +644,8 @@ function updateInputDisplay() {
     input.innerText = state.currentAnswer;
     input.classList.remove('wrong');
     
-    if (state.mode === 'divide_adv') {
+    const isDivideMode = state.mode === 'divide_adv' || (state.mode === 'quiz' && state.questions[state.currentQuestionIndex] && state.questions[state.currentQuestionIndex].operation === 'divide_adv');
+    if (isDivideMode) {
         const inputRem = document.getElementById('answer-remainder');
         inputRem.innerText = state.currentRemainder;
         inputRem.classList.remove('wrong');
@@ -476,7 +665,9 @@ function checkAnswer() {
     let expectedRem = 0;
     let intRem = 0;
     
-    if (state.mode === 'divide_adv') {
+    const isDivideQ = state.mode === 'divide_adv' || (state.mode === 'quiz' && state.questions[state.currentQuestionIndex] && state.questions[state.currentQuestionIndex].operation === 'divide_adv');
+    
+    if (isDivideQ) {
         intRem = state.currentRemainder === '' ? 0 : parseInt(state.currentRemainder);
         expectedRem = state.expectedAnswer.remainder;
         isCorrect = (intAns === state.expectedAnswer.quotient && intRem === expectedRem);
@@ -487,16 +678,29 @@ function checkAnswer() {
     if (isCorrect) {
         isTransitioning = true;
         inputEl.className = 'answer-input correct';
-        if (state.mode === 'divide_adv') document.getElementById('answer-remainder').className = 'answer-input correct';
-        setTimeout(() => handleCorrect(), 400); 
+        if (isDivideQ) document.getElementById('answer-remainder').className = 'answer-input correct';
+        
+        state.questionResults[state.currentQuestionIndex] = 'correct';
+        
+        // Track quiz result
+        if (state.mode === 'quiz') {
+            const op = state.questions[state.currentQuestionIndex].operation;
+            state.quizResults[op].correct++;
+        }
+        
+        setTimeout(() => handleCorrect(), 400);
     } else {
         inputEl.className = 'answer-input wrong';
-        if (state.mode === 'divide_adv') document.getElementById('answer-remainder').className = 'answer-input wrong';
+        if (isDivideQ) document.getElementById('answer-remainder').className = 'answer-input wrong';
         
+        // Track quiz result
+        if (state.mode === 'quiz') {
+            const op = state.questions[state.currentQuestionIndex].operation;
+            state.quizResults[op].wrong++;
+        }
+        
+        // Track mistakes for table modes (affects table completion check)
         if (state.mode === 'multiply' || state.mode === 'divide') {
-            state.questionResults[state.currentQuestionIndex] = 'wrong'; 
-            renderDots(); 
-            
             const num1 = state.currentTable;
             const num2 = state.questions[state.currentQuestionIndex];
             let mistakeStr = state.mode === 'multiply' 
@@ -506,46 +710,44 @@ function checkAnswer() {
             if (!state.mistakesThisSession.includes(mistakeStr)) {
                 state.mistakesThisSession.push(mistakeStr);
             }
-
-            isTransitioning = true;
-            setTimeout(() => handleCorrect(), 800); 
-        } else {
-            // Chế độ nâng cao / cộng trừ: Hiện đáp án đúng rồi qua câu mới
-            state.questionResults[state.currentQuestionIndex] = 'wrong'; // mark as wrong
-            renderDots();
-            
-            if (state.mode === 'divide_adv') {
-                state.currentAnswer = state.expectedAnswer.quotient.toString();
-                state.currentRemainder = expectedRem.toString();
-            } else {
-                state.currentAnswer = state.expectedAnswer.toString();
-            }
-            updateInputDisplay();
-            inputEl.style.color = 'var(--error)';
-            if (state.mode === 'divide_adv') document.getElementById('answer-remainder').style.color = 'var(--error)';
-            
-            isTransitioning = true;
-            setTimeout(() => {
-                inputEl.style.color = '';
-                if (state.mode === 'divide_adv') document.getElementById('answer-remainder').style.color = '';
-                handleCorrect();
-            }, 1200);
         }
+        
+        // Sai → không qua câu mới, phải làm lại cho đến khi đúng
+        isTransitioning = true;
+        setTimeout(() => handleWrong(), 800);
     }
 }
 
 function handleCorrect() {
     state.learningProgress++;
+    state.currentQuestionIndex++;
     renderDots();
     
-    const total = (state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv') ? state.config.totalQuestions : 10;
-    
-    if (state.learningProgress >= total) {
+    if (state.currentQuestionIndex >= state.questions.length) {
         finishTable();
     } else {
-        state.currentQuestionIndex++;
         loadQuestion();
         isTransitioning = false;
+    }
+}
+
+function handleWrong() {
+    // Không chuyển câu mới – reset đáp án để người dùng làm lại câu hiện tại
+    state.currentAnswer = '';
+    state.currentRemainder = '';
+    isTransitioning = false;
+    
+    const inputEl = document.getElementById('answer-input');
+    inputEl.innerText = '';
+    inputEl.className = 'answer-input active';
+    
+    const isDivideQ = state.mode === 'divide_adv' || (state.mode === 'quiz' && state.questions[state.currentQuestionIndex] && state.questions[state.currentQuestionIndex].operation === 'divide_adv');
+    if (isDivideQ) {
+        const inputRem = document.getElementById('answer-remainder');
+        inputRem.innerText = '';
+        inputRem.className = 'answer-input';
+        state.activeInput = 'quotient';
+        focusInput('quotient');
     }
 }
 
@@ -553,19 +755,66 @@ function finishTable() {
     const titleEl = document.getElementById('congrats-title');
     const subtextEl = document.querySelector('.congrats-subtext');
 
+    if (state.mode === 'quiz') {
+        state.tableProgress.quizCount += state.learningProgress;
+        state.sessionAddedCount += state.learningProgress;
+        saveData();
+        updateMilestoneDisplay();
+
+        // Build breakdown
+        let totalCorrect = 0;
+        let totalWrong = 0;
+        let breakdownHtml = '<div class="quiz-breakdown">';
+        QUIZ_OPERATIONS.forEach(op => {
+            if (state.quizResults[op.id]) {
+                const r = state.quizResults[op.id];
+                totalCorrect += r.correct;
+                totalWrong += r.wrong;
+                breakdownHtml += `<div class="quiz-breakdown-row">
+                    <span class="op-name">${op.icon} ${op.label}</span>
+                    <span class="op-score">
+                        <span class="correct-count">✓${r.correct}</span>
+                        <span class="wrong-count">✗${r.wrong}</span>
+                    </span>
+                </div>`;
+            }
+        });
+        breakdownHtml += '</div>';
+        breakdownHtml += `<div class="quiz-total-score">${totalCorrect}/${state.config.totalQuestions}</div>`;
+
+        const quizBreakdown = document.getElementById('quiz-breakdown');
+        quizBreakdown.innerHTML = breakdownHtml;
+        quizBreakdown.style.display = 'block';
+
+        if (totalWrong === 0) {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#4f46e5', '#3b82f6', '#10b981', '#f43f5e', '#eab308']
+            });
+        }
+
+        titleEl.innerText = 'Tuyệt vời!';
+        titleEl.style.color = 'var(--success)';
+        subtextEl.innerHTML = `Bé đã hoàn thành bài kiểm tra rất xuất sắc!`;
+        document.getElementById('congrats-overlay').classList.add('show');
+        return;
+    }
+
     if (state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv') {
         if (state.mode === 'add') {
-            state.tableProgress.addCount += state.config.totalQuestions;
-            state.sessionAddedCount += state.config.totalQuestions;
+            state.tableProgress.addCount += state.learningProgress;
+            state.sessionAddedCount += state.learningProgress;
         } else if (state.mode === 'subtract') {
-            state.tableProgress.subtractCount += state.config.totalQuestions;
-            state.sessionAddedCount += state.config.totalQuestions;
+            state.tableProgress.subtractCount += state.learningProgress;
+            state.sessionAddedCount += state.learningProgress;
         } else if (state.mode === 'multiply_adv') {
-            state.tableProgress.multiplyAdvCount += state.config.totalQuestions;
-            state.sessionAddedCount += state.config.totalQuestions;
+            state.tableProgress.multiplyAdvCount += state.learningProgress;
+            state.sessionAddedCount += state.learningProgress;
         } else if (state.mode === 'divide_adv') {
-            state.tableProgress.divideAdvCount += state.config.totalQuestions;
-            state.sessionAddedCount += state.config.totalQuestions;
+            state.tableProgress.divideAdvCount += state.learningProgress;
+            state.sessionAddedCount += state.learningProgress;
         }
         saveData();
         updateMilestoneDisplay();
@@ -620,6 +869,15 @@ function finishTable() {
 function nextTable() {
     document.getElementById('congrats-overlay').classList.remove('show');
     isTransitioning = false;
+    
+    // Hide quiz breakdown
+    const quizBreakdown = document.getElementById('quiz-breakdown');
+    if (quizBreakdown) quizBreakdown.style.display = 'none';
+    
+    if (state.mode === 'quiz') {
+        startQuizMode();
+        return;
+    }
     
     if (state.mode === 'add' || state.mode === 'subtract' || state.mode === 'multiply_adv' || state.mode === 'divide_adv') {
         startMathMode(); 

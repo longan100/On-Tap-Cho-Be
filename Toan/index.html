@@ -75,6 +75,7 @@
             <button class="mode-btn" id="btn-divide-adv" onclick="setMode('divide_adv')" style="min-width: 30%;">Chia (÷)</button>
             <button class="mode-btn" id="btn-add" onclick="setMode('add')" style="min-width: 30%;">Cộng (+)</button>
             <button class="mode-btn" id="btn-subtract" onclick="setMode('subtract')" style="min-width: 30%;">Trừ (-)</button>
+            <button class="mode-btn" id="btn-quiz" onclick="setMode('quiz')" style="min-width: 100%;">📝 Kiểm Tra</button>
         </div>
 
         <div id="dynamic-selector-area">
@@ -134,6 +135,66 @@
                     Bắt Đầu Luyện Tập
                 </button>
             </div>
+            
+            <div class="math-config" id="quiz-config" style="display: none; padding: 5px 0 15px 0;">
+                <!-- MILESTONE BANNER -->
+                <div class="flex items-center gap-3 p-3 bg-slate-100 rounded-xl mb-4 border border-slate-200">
+                    <div class="text-3xl" id="quiz-milestone-icon">🌱</div>
+                    <div class="flex-1">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Danh hiệu</div>
+                        <div class="text-sm font-extrabold" id="quiz-milestone-title">Tập Sự</div>
+                    </div>
+                    <div class="text-right flex flex-col justify-end items-end">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Đã hoàn thành</div>
+                        <div class="flex items-center justify-end gap-1.5 mt-0.5" style="min-height: 20px;">
+                            <div class="text-lg font-black text-primary leading-none" id="quiz-milestone-count">0<span class="text-[10px] font-bold text-slate-500 ml-0.5">câu</span></div>
+                            <div id="quiz-recent-added-badge" class="bg-success text-white text-[10px] px-1.5 py-0.5 rounded font-black shadow-sm animate__animated hidden" style="line-height:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-section-title">Chọn phép tính</div>
+                <div id="quiz-ops-grid" class="quiz-ops-grid">
+                    <!-- Rendered dynamically by renderQuizOperations() -->
+                </div>
+                
+                <div class="quiz-section-title">Cấu hình</div>
+                <div class="config-row">
+                    <label>Số chữ số:</label>
+                    <select id="quiz-digits">
+                        <option value="1">1 chữ số</option>
+                        <option value="2" selected>2 chữ số</option>
+                        <option value="3">3 chữ số</option>
+                        <option value="4">4 chữ số</option>
+                        <option value="5">5 chữ số</option>
+                        <option value="6">6 chữ số</option>
+                    </select>
+                </div>
+                
+                <div id="quiz-div-mode" class="config-row hidden">
+                    <label>Kiểu chia:</label>
+                    <select id="quiz-divide-type">
+                        <option value="mixed">Hỗn hợp</option>
+                        <option value="exact">Chia hết</option>
+                        <option value="remainder">Có dư</option>
+                    </select>
+                </div>
+                
+                <div class="config-row">
+                    <label>Số câu hỏi:</label>
+                    <select id="quiz-total">
+                        <option value="5">5 câu</option>
+                        <option value="10" selected>10 câu</option>
+                        <option value="15">15 câu</option>
+                        <option value="20">20 câu</option>
+                        <option value="30">30 câu</option>
+                        <option value="40">40 câu</option>
+                        <option value="50">50 câu</option>
+                    </select>
+                </div>
+                
+                <button class="start-quiz-btn" onclick="startQuizMode()">🚀 Bắt Đầu Kiểm Tra</button>
+            </div>
             </div>
         </div>
     </aside>
@@ -176,6 +237,7 @@
         <div class="congrats-icon">🏆</div>
         <div class="congrats-text" id="congrats-title">Tuyệt vời!</div>
         <div class="congrats-subtext">Bạn đã hoàn thành bảng này.</div>
+        <div id="quiz-breakdown" style="display: none;"></div>
         <button class="next-btn" onclick="nextTable()">Học Bảng Tiếp Theo</button>
     </div>
     </main>
