@@ -179,7 +179,7 @@ const questions = [
         question: "Biển báo cấm xe đi ngược chiều gồm có mấy bộ phận.",
         image: null,
         options: ["A. 3 bộ phận.", "B. 5 bộ phận.", "C. 4 bộ phận."],
-        answer: 2
+        answer: 0
     },
     {
         id: 24,
