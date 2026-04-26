@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tự Luận Tin Học Lớp 3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #fff 0%, #ffecd2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .answer-area {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 120px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            resize: vertical;
+            width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .answer-area:focus {
+            outline: none;
+            border-color: #a8edea;
+            box-shadow: 0 0 0 3px rgba(168, 237, 234, 0.2);
+        }
+
+        .answer-display {
+            background: #f8f9fa;
+            border-left: 4px solid #a8edea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .answer-display h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .answer-display p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+
+        .answer-display ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .toggle-btn {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(168, 237, 234, 0.4);
+        }
+
+        .answer-display.hidden {
+            display: none;
+        }
+
+        .sub-question {
+            margin-left: 20px;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 3px solid #fed6e3;
+        }
+
+        .sub-question-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 TỰ LUẬN TIN HỌC LỚP 3</h1>
+            <p>Đề cương ôn tập cuối học kỳ II</p>
+        </div>
+
+        <div class="content">
+            <!-- Câu 1 -->
+            <div class="question-card">
+                <span class="question-number">Câu 1</span>
+                <div class="question-text">Em làm thế nào để bảo vệ thông tin cá nhân và gia đình khi giao tiếp qua mạng Internet?</div>
+                <textarea class="answer-area" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <button class="toggle-btn" onclick="toggleAnswer(1)">Xem đáp án</button>
+                <div class="answer-display hidden" id="answer1">
+                    <h4>💡 Đáp án tham khảo:</h4>
+                    <p>Bảo vệ thông tin cá nhân và gia đình: không nên cung cấp tên và địa chỉ cho người lạ, không gửi và nhận tệp từ người không quen biết, bảo vệ mật khẩu khi dùng máy tính.</p>
+                </div>
+            </div>
+
+            <!-- Câu 2 -->
+            <div class="question-card">
+                <span class="question-number">Câu 2</span>
+                <div class="question-text">Như thế nào là thực hiện công việc theo từng bước?</div>
+                <textarea class="answer-area" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <button class="toggle-btn" onclick="toggleAnswer(2)">Xem đáp án</button>
+                <div class="answer-display hidden" id="answer2">
+                    <h4>💡 Đáp án tham khảo:</h4>
+                    <p>Có nhiều công việc được thực hiện theo từng bước, mỗi bước là một việc nhỏ và các bước phải được xếp theo một thứ tự nhất định.</p>
+                </div>
+            </div>
+
+            <!-- Câu 3 -->
+            <div class="question-card">
+                <span class="question-number">Câu 3</span>
+                <div class="question-text">Chuyển thành dạng "Nếu… thì…"</div>
+                
+                <div class="sub-question">
+                    <label class="sub-question-label">a) Khi em đi học muộn, lớp em sẽ bị trừ điểm thi đua.</label>
+                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+
+                <div class="sub-question">
+                    <label class="sub-question-label">b) Khi đi bộ đi học, em cần đi trên vỉa hè.</label>
+                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+
+                <div class="sub-question">
+                    <label class="sub-question-label">c) Hôm nay trời mưa, Nam không đi đá bóng.</label>
+                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+
+                <div class="sub-question">
+                    <label class="sub-question-label">d) Hôm nay học thể dục, Hoa mặc áo quần thể dục và đeo giày.</label>
+                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+
+                <button class="toggle-btn" onclick="toggleAnswer(3)">Xem đáp án</button>
+                <div class="answer-display hidden" id="answer3">
+                    <h4>💡 Đáp án tham khảo:</h4>
+                    <p><strong>a)</strong> Nếu em đi học muộn thì lớp em sẽ bị trừ điểm thi đua.</p>
+                    <p><strong>b)</strong> Nếu em đi bộ đi học thì em cần đi trên vỉa hè.</p>
+                    <p><strong>c)</strong> Nếu hôm nay trời mưa thì Nam không đi đá bóng.</p>
+                    <p><strong>d)</strong> Nếu hôm nay học thể dục thì Hoa mặc áo quần thể dục và đeo giày.</p>
+                </div>
+            </div>
+
+            <!-- Câu 4 -->
+            <div class="question-card">
+                <span class="question-number">Câu 4</span>
+                <div class="question-text">Tại sao phải chia một việc thành nhiều việc nhỏ hơn?</div>
+                <textarea class="answer-area" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <button class="toggle-btn" onclick="toggleAnswer(4)">Xem đáp án</button>
+                <div class="answer-display hidden" id="answer4">
+                    <h4>💡 Đáp án tham khảo:</h4>
+                    <p>Chia một việc thành những việc nhỏ hơn sẽ giúp chúng ta dễ hiểu và dễ thực hiện hơn.</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="tracnghiem.html" class="nav-btn">← Về trang trắc nghiệm</a>
+                <a href="index.html" class="nav-btn secondary">🏠 Trang chủ</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswer(questionNumber) {
+            const answer = document.getElementById(`answer${questionNumber}`);
+            answer.classList.toggle('hidden');
+            
+            const btn = answer.previousElementSibling;
+            if (answer.classList.contains('hidden')) {
+                btn.textContent = 'Xem đáp án';
+            } else {
+                btn.textContent = 'Ẩn đáp án';
+            }
+        }
+    </script>
+</body>
+</html>
