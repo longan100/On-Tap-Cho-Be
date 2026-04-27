@@ -7,18 +7,54 @@ let results = {
     'cam_xuc': 0
 };
 
+// Map kỹ năng -> tên biến dữ liệu
+const SKILL_DATA_VARS = {
+    'nghia_tu': 'questionsData_nghia_tu',
+    'y_chinh': 'questionsData_y_chinh',
+    'suy_luan': 'questionsData_suy_luan',
+    'cam_xuc': 'questionsData_cam_xuc'
+};
+
+// Load script động theo kỹ năng
+function loadSkillScript(skill) {
+    return new Promise((resolve, reject) => {
+        const varName = SKILL_DATA_VARS[skill];
+        // Kiểm tra nếu đã load rồi
+        if (typeof window[varName] !== 'undefined') {
+            resolve(window[varName]);
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = `./data/questions_${skill}.js`;
+        script.onload = () => {
+            // Đợi một chút để biến được gán
+            setTimeout(() => {
+                if (typeof window[varName] !== 'undefined') {
+                    resolve(window[varName]);
+                } else {
+                    reject(new Error(`Variable ${varName} not found after loading`));
+                }
+            }, 10);
+        };
+        script.onerror = () => reject(new Error(`Failed to load ${script.src}`));
+        document.head.appendChild(script);
+    });
+}
+
 async function startDiagnosis() {
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('loading').classList.remove('hidden');
 
     try {
-        if (typeof questionsData === 'undefined') {
-             throw new Error("Không tìm thấy questionsData. Bạn đã load đúng file questions.js chưa?");
-        }
-        const allQuestions = questionsData;
+        // Load tất cả các file kỹ năng cho chẩn đoán
+        const skills = ['nghia_tu', 'y_chinh', 'suy_luan', 'cam_xuc'];
+        const loadedData = await Promise.all(skills.map(sk => loadSkillScript(sk)));
+        
+        // Gộp tất cả câu hỏi
+        const allQuestions = loadedData.flat();
         
         // Lấy 2 câu tầng 1 cho mỗi kỹ năng
-        const skills = ['nghia_tu', 'y_chinh', 'suy_luan', 'cam_xuc'];
         let pool = [];
         
         skills.forEach(sk => {

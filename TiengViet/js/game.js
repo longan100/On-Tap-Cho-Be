@@ -19,22 +19,68 @@ let questionStartTime = 0;
 let todayDateStr = new Date().toISOString().split('T')[0];
 let sessionResults = [];
 
-// Khởi tạo
-document.addEventListener("DOMContentLoaded", () => {
-    // Không dùng fetch nữa, lấy trực tiếp từ mảng `questionsData` ở file data/questions.js được nhúng vào HTML
-    if (typeof questionsData === 'undefined') {
-        document.getElementById('loading').innerText = "Lỗi khi tải dữ liệu câu hỏi. File questions.js chưa được load.";
-        return;
-    }
-    questionsPool = questionsData;
+// Map kỹ năng -> tên biến dữ liệu
+const SKILL_DATA_VARS = {
+    'nghia_tu': 'questionsData_nghia_tu',
+    'y_chinh': 'questionsData_y_chinh',
+    'suy_luan': 'questionsData_suy_luan',
+    'cam_xuc': 'questionsData_cam_xuc'
+};
 
+// Load script động theo kỹ năng
+function loadSkillScript(skill) {
+    return new Promise((resolve, reject) => {
+        const varName = SKILL_DATA_VARS[skill];
+        // Kiểm tra nếu đã load rồi
+        if (typeof window[varName] !== 'undefined') {
+            resolve(window[varName]);
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = `./data/questions_${skill}.js`;
+        script.onload = () => {
+            // Đợi một chút để biến được gán
+            setTimeout(() => {
+                if (typeof window[varName] !== 'undefined') {
+                    resolve(window[varName]);
+                } else {
+                    reject(new Error(`Variable ${varName} not found after loading`));
+                }
+            }, 10);
+        };
+        script.onerror = () => reject(new Error(`Failed to load ${script.src}`));
+        document.head.appendChild(script);
+    });
+}
+
+// Khởi tạo
+document.addEventListener("DOMContentLoaded", async () => {
     // 1. Phạt điểm nếu bỏ quá 3 ngày, bắt đầu phiên mới
     MasteryManager.processDecay(todayDateStr);
 
-    // 2. Chốt số lượng cấu hỏi mỗi kỹ năng
+    // 2. Chốt số lượng câu hỏi mỗi kỹ năng dựa trên mastery hiện tại
     const allocations = MasteryManager.getAllocation(); // ex: { nghia_tu: 1, y_chinh: 2...}
+    const skillsToLoad = Object.keys(allocations).filter(sk => allocations[sk] > 0);
+    
+    // 3. Load dữ liệu câu hỏi theo từng kỹ năng cần thiết
+    try {
+        const loadedData = await Promise.all(skillsToLoad.map(sk => loadSkillScript(sk)));
+        
+        // Gộp tất cả câu hỏi vào pool
+        questionsPool = loadedData.flat();
+        
+        if (questionsPool.length === 0) {
+            document.getElementById('loading').innerText = "Không có câu hỏi nào được tải.";
+            return;
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById('loading').innerText = "Lỗi khi tải dữ liệu câu hỏi: " + err.message;
+        return;
+    }
 
-    // 3. Lấy ra bộ 4 câu hỏi phù hợp nhất
+    // 4. Lấy ra bộ 4 câu hỏi phù hợp nhất
     const data = StorageManager.getData();
     let selectedQuestions = [];
 
