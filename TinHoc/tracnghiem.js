@@ -267,7 +267,7 @@ function renderQuestions() {
             html += `<span class="option-text">${letter}. `;
             
             if (q.hasImage && option.image) {
-                html += `${option.text} <img src="${option.image}" class="question-image" alt="${option.text}">`;
+                html += `<img src="${option.image}" class="question-image" alt="${option.text}">`;
             } else {
                 html += option.text;
             }
@@ -361,8 +361,10 @@ form.addEventListener('submit', function(e) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đã nộp bài';
     
-    // Cuộn lên đầu trang để xem kết quả
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Cuộn xuống kết quả
+    setTimeout(() => {
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 });
 
 function resetQuiz() {

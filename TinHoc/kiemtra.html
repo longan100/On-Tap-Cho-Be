@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Tổng Hợp - Tin Học Lớp 3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 30px 0 20px 0;
+            text-align: center;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 20%, #fff 20%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"],
+        .option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .answer-area {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 120px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            resize: vertical;
+            width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .answer-area:focus {
+            outline: none;
+            border-color: #11998e;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.2);
+        }
+
+        .sub-question {
+            margin-left: 20px;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 3px solid #38ef7d;
+        }
+
+        .sub-question-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .result-display {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result-display.correct {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+
+        .result-display.incorrect {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+
+        .result-display.partial {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            display: block;
+            margin: 40px auto;
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(17, 153, 142, 0.6);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            display: none;
+        }
+
+        .score-display.show {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-display h3 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .score-display .score-detail {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .score-display .total-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #11998e;
+            margin: 20px 0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 KIỂM TRA TỔNG HỢP TIN HỌC LỚP 3</h1>
+            <p>Trắc nghiệm (xáo trộn) + Tự luận</p>
+        </div>
+
+        <div class="content">
+            <!-- Phần Trắc Nghiệm -->
+            <div class="section-title">📝 PHẦN I: TRẮC NGHIỆM (16 câu)</div>
+            <form id="tracnghiemForm">
+                <!-- Câu hỏi trắc nghiệm sẽ được tạo động -->
+            </form>
+
+            <!-- Phần Tự Luận -->
+            <div class="section-title">✍️ PHẦN II: TỰ LUẬN (4 câu)</div>
+            <div id="tuluanForm">
+                <!-- Câu hỏi tự luận -->
+            </div>
+
+            <!-- Submit Button -->
+            <button class="submit-btn" id="submitBtn">Nộp bài và xem điểm</button>
+
+            <!-- Score Display -->
+            <div class="score-display" id="score-display">
+                <h3>🎉 KẾT QUẢ BÀI LÀM</h3>
+                <div class="score-detail" id="tracnghiem-score"></div>
+                <div class="score-detail" id="tuluan-score"></div>
+                <div class="total-score" id="total-score"></div>
+                <p id="result-message"></p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="index.html" class="nav-btn">🏠 Về trang chủ</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="kiemtra.js"></script>
+</body>
+</html>

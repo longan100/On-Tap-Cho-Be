@@ -249,18 +249,18 @@
         </div>
 
         <div class="quiz-content">
+            <form id="quizForm">
+                <!-- Câu hỏi sẽ được tạo động bằng JavaScript -->
+            </form>
+            
+            <button type="submit" class="submit-btn" onclick="document.getElementById('quizForm').dispatchEvent(new Event('submit'))">Nộp bài</button>
+
             <div class="result-box" id="resultBox">
                 <h2>🎉 KẾT QUẢ BÀI LÀM</h2>
                 <div class="score" id="scoreDisplay">0/16</div>
                 <div class="result-message" id="resultMessage"></div>
                 <button class="reset-btn" onclick="resetQuiz()">Làm lại</button>
             </div>
-
-            <form id="quizForm">
-                <!-- Câu hỏi sẽ được tạo động bằng JavaScript -->
-            </form>
-            
-            <button type="submit" class="submit-btn" onclick="document.getElementById('quizForm').dispatchEvent(new Event('submit'))">Nộp bài</button>
         </div>
     </div>
 

@@ -127,9 +127,9 @@
             line-height: 1.8;
         }
 
-        .toggle-btn {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            color: #333;
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
             padding: 10px 20px;
             font-size: 14px;
@@ -140,13 +140,81 @@
             transition: all 0.3s ease;
         }
 
-        .toggle-btn:hover {
+        .check-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(168, 237, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .answer-display.hidden {
+        .result-display {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
             display: none;
+        }
+
+        .result-display.correct {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+
+        .result-display.incorrect {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+
+        .result-display.partial {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+
+        .submit-all-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 30px auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .submit-all-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(17, 153, 142, 0.4);
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .score-display.show {
+            display: block;
+        }
+
+        .score-display h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .score-display p {
+            font-size: 18px;
+            color: #555;
         }
 
         .sub-question {
@@ -226,24 +294,16 @@
             <div class="question-card">
                 <span class="question-number">Câu 1</span>
                 <div class="question-text">Em làm thế nào để bảo vệ thông tin cá nhân và gia đình khi giao tiếp qua mạng Internet?</div>
-                <textarea class="answer-area" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
-                <button class="toggle-btn" onclick="toggleAnswer(1)">Xem đáp án</button>
-                <div class="answer-display hidden" id="answer1">
-                    <h4>💡 Đáp án tham khảo:</h4>
-                    <p>Bảo vệ thông tin cá nhân và gia đình: không nên cung cấp tên và địa chỉ cho người lạ, không gửi và nhận tệp từ người không quen biết, bảo vệ mật khẩu khi dùng máy tính.</p>
-                </div>
+                <textarea class="answer-area" id="answer-input-1" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-1"></div>
             </div>
 
             <!-- Câu 2 -->
             <div class="question-card">
                 <span class="question-number">Câu 2</span>
                 <div class="question-text">Như thế nào là thực hiện công việc theo từng bước?</div>
-                <textarea class="answer-area" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
-                <button class="toggle-btn" onclick="toggleAnswer(2)">Xem đáp án</button>
-                <div class="answer-display hidden" id="answer2">
-                    <h4>💡 Đáp án tham khảo:</h4>
-                    <p>Có nhiều công việc được thực hiện theo từng bước, mỗi bước là một việc nhỏ và các bước phải được xếp theo một thứ tự nhất định.</p>
-                </div>
+                <textarea class="answer-area" id="answer-input-2" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-2"></div>
             </div>
 
             <!-- Câu 3 -->
@@ -253,44 +313,42 @@
                 
                 <div class="sub-question">
                     <label class="sub-question-label">a) Khi em đi học muộn, lớp em sẽ bị trừ điểm thi đua.</label>
-                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                    <textarea class="answer-area" id="answer-input-3a" placeholder="Nhập câu trả lời của em..."></textarea>
                 </div>
 
                 <div class="sub-question">
                     <label class="sub-question-label">b) Khi đi bộ đi học, em cần đi trên vỉa hè.</label>
-                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                    <textarea class="answer-area" id="answer-input-3b" placeholder="Nhập câu trả lời của em..."></textarea>
                 </div>
 
                 <div class="sub-question">
                     <label class="sub-question-label">c) Hôm nay trời mưa, Nam không đi đá bóng.</label>
-                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                    <textarea class="answer-area" id="answer-input-3c" placeholder="Nhập câu trả lời của em..."></textarea>
                 </div>
 
                 <div class="sub-question">
                     <label class="sub-question-label">d) Hôm nay học thể dục, Hoa mặc áo quần thể dục và đeo giày.</label>
-                    <textarea class="answer-area" placeholder="Nhập câu trả lời của em..."></textarea>
+                    <textarea class="answer-area" id="answer-input-3d" placeholder="Nhập câu trả lời của em..."></textarea>
                 </div>
 
-                <button class="toggle-btn" onclick="toggleAnswer(3)">Xem đáp án</button>
-                <div class="answer-display hidden" id="answer3">
-                    <h4>💡 Đáp án tham khảo:</h4>
-                    <p><strong>a)</strong> Nếu em đi học muộn thì lớp em sẽ bị trừ điểm thi đua.</p>
-                    <p><strong>b)</strong> Nếu em đi bộ đi học thì em cần đi trên vỉa hè.</p>
-                    <p><strong>c)</strong> Nếu hôm nay trời mưa thì Nam không đi đá bóng.</p>
-                    <p><strong>d)</strong> Nếu hôm nay học thể dục thì Hoa mặc áo quần thể dục và đeo giày.</p>
-                </div>
+                <div class="result-display" id="result-3"></div>
             </div>
 
             <!-- Câu 4 -->
             <div class="question-card">
                 <span class="question-number">Câu 4</span>
                 <div class="question-text">Tại sao phải chia một việc thành nhiều việc nhỏ hơn?</div>
-                <textarea class="answer-area" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
-                <button class="toggle-btn" onclick="toggleAnswer(4)">Xem đáp án</button>
-                <div class="answer-display hidden" id="answer4">
-                    <h4>💡 Đáp án tham khảo:</h4>
-                    <p>Chia một việc thành những việc nhỏ hơn sẽ giúp chúng ta dễ hiểu và dễ thực hiện hơn.</p>
-                </div>
+                <textarea class="answer-area" id="answer-input-4" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-4"></div>
+            </div>
+
+            <!-- Submit All Button -->
+            <button class="submit-all-btn" onclick="submitAll()">Nộp bài và xem điểm</button>
+
+            <!-- Score Display -->
+            <div class="score-display" id="score-display">
+                <h3>🎯 Kết quả của em</h3>
+                <p id="score-text"></p>
             </div>
 
             <!-- Navigation -->
@@ -302,16 +360,214 @@
     </div>
 
     <script>
-        function toggleAnswer(questionNumber) {
-            const answer = document.getElementById(`answer${questionNumber}`);
-            answer.classList.toggle('hidden');
-            
-            const btn = answer.previousElementSibling;
-            if (answer.classList.contains('hidden')) {
-                btn.textContent = 'Xem đáp án';
-            } else {
-                btn.textContent = 'Ẩn đáp án';
+        // Đáp án chuẩn cho từng câu hỏi
+        const correctAnswers = {
+            1: {
+                keywords: ['không cung cấp', 'tên', 'địa chỉ', 'người lạ', 'không gửi', 'không nhận', 'tệp', 'bảo vệ', 'mật khẩu'],
+                fullAnswer: 'Bảo vệ thông tin cá nhân và gia đình: không nên cung cấp tên và địa chỉ cho người lạ, không gửi và nhận tệp từ người không quen biết, bảo vệ mật khẩu khi dùng máy tính.'
+            },
+            2: {
+                keywords: ['công việc', 'từng bước', 'việc nhỏ', 'thứ tự', 'xếp'],
+                fullAnswer: 'Có nhiều công việc được thực hiện theo từng bước, mỗi bước là một việc nhỏ và các bước phải được xếp theo một thứ tự nhất định.'
+            },
+            3: {
+                a: {
+                    keywords: ['nếu', 'đi học muộn', 'thì', 'trừ điểm'],
+                    fullAnswer: 'Nếu em đi học muộn thì lớp em sẽ bị trừ điểm thi đua.'
+                },
+                b: {
+                    keywords: ['nếu', 'đi bộ', 'thì', 'vỉa hè'],
+                    fullAnswer: 'Nếu em đi bộ đi học thì em cần đi trên vỉa hè.'
+                },
+                c: {
+                    keywords: ['nếu', 'trời mưa', 'thì', 'không đá bóng'],
+                    fullAnswer: 'Nếu hôm nay trời mưa thì Nam không đi đá bóng.'
+                },
+                d: {
+                    keywords: ['nếu', 'học thể dục', 'thì', 'áo quần', 'giày'],
+                    fullAnswer: 'Nếu hôm nay học thể dục thì Hoa mặc áo quần thể dục và đeo giày.'
+                }
+            },
+            4: {
+                keywords: ['chia', 'việc nhỏ', 'dễ hiểu', 'dễ thực hiện'],
+                fullAnswer: 'Chia một việc thành những việc nhỏ hơn sẽ giúp chúng ta dễ hiểu và dễ thực hiện hơn.'
             }
+        };
+
+        // Lưu trữ kết quả kiểm tra
+        let results = {
+            1: null,
+            2: null,
+            3: null,
+            4: null
+        };
+
+        // Hàm chuẩn hóa chuỗi (loại bỏ dấu, chuyển thường)
+        function normalizeString(str) {
+            return str.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[đĐ]/g, 'd')
+                .replace(/[^a-z0-9\s]/g, '')
+                .trim();
+        }
+
+        // Hàm kiểm tra độ tương đồng
+        function checkSimilarity(userAnswer, keywords) {
+            const normalized = normalizeString(userAnswer);
+            let matchCount = 0;
+            
+            keywords.forEach(keyword => {
+                if (normalized.includes(normalizeString(keyword))) {
+                    matchCount++;
+                }
+            });
+            
+            const similarity = (matchCount / keywords.length) * 100;
+            return similarity;
+        }
+
+        // Hàm kiểm tra đáp án từng câu
+        function checkAnswer(questionNumber) {
+            let userAnswer, similarity, resultDiv, resultClass, resultText;
+            
+            if (questionNumber === 3) {
+                // Câu 3 có nhiều phần
+                const answers = {
+                    a: document.getElementById('answer-input-3a').value.trim(),
+                    b: document.getElementById('answer-input-3b').value.trim(),
+                    c: document.getElementById('answer-input-3c').value.trim(),
+                    d: document.getElementById('answer-input-3d').value.trim()
+                };
+                
+                if (!answers.a || !answers.b || !answers.c || !answers.d) {
+                    alert('Vui lòng trả lời đầy đủ tất cả các phần a, b, c, d!');
+                    return;
+                }
+                
+                let totalScore = 0;
+                let details = '';
+                
+                ['a', 'b', 'c', 'd'].forEach(part => {
+                    const score = checkSimilarity(answers[part], correctAnswers[3][part].keywords);
+                    totalScore += score;
+                    const status = score >= 70 ? '✅' : score >= 40 ? '⚠️' : '❌';
+                    details += `<br>${status} Phần ${part}: ${Math.round(score)}%`;
+                });
+                
+                const avgScore = totalScore / 4;
+                resultDiv = document.getElementById('result-3');
+                
+                if (avgScore >= 70) {
+                    resultClass = 'correct';
+                    resultText = `🎉 Tuyệt vời! Điểm trung bình: ${Math.round(avgScore)}%${details}`;
+                    results[3] = 1;
+                } else if (avgScore >= 40) {
+                    resultClass = 'partial';
+                    resultText = `⚠️ Được một phần! Điểm trung bình: ${Math.round(avgScore)}%${details}<br><br>💡 Gợi ý: Hãy dùng cấu trúc "Nếu... thì..." cho tất cả các câu.`;
+                    results[3] = 0.5;
+                } else {
+                    resultClass = 'incorrect';
+                    resultText = `❌ Chưa đúng! Điểm trung bình: ${Math.round(avgScore)}%${details}<br><br>💡 Gợi ý: Hãy chuyển đổi câu sang dạng "Nếu [điều kiện] thì [kết quả]"`;
+                    results[3] = 0;
+                }
+            } else {
+                // Các câu khác
+                userAnswer = document.getElementById(`answer-input-${questionNumber}`).value.trim();
+                
+                if (!userAnswer) {
+                    alert('Vui lòng nhập câu trả lời trước khi kiểm tra!');
+                    return;
+                }
+                
+                similarity = checkSimilarity(userAnswer, correctAnswers[questionNumber].keywords);
+                resultDiv = document.getElementById(`result-${questionNumber}`);
+                
+                if (similarity >= 70) {
+                    resultClass = 'correct';
+                    resultText = `🎉 Chính xác! Điểm: ${Math.round(similarity)}%`;
+                    results[questionNumber] = 1;
+                } else if (similarity >= 40) {
+                    resultClass = 'partial';
+                    resultText = `⚠️ Được một phần! Điểm: ${Math.round(similarity)}%<br><br>💡 Đáp án: ${correctAnswers[questionNumber].fullAnswer}`;
+                    results[questionNumber] = 0.5;
+                } else {
+                    resultClass = 'incorrect';
+                    resultText = `❌ Chưa chính xác! Điểm: ${Math.round(similarity)}%<br><br>💡 Đáp án: ${correctAnswers[questionNumber].fullAnswer}`;
+                    results[questionNumber] = 0;
+                }
+            }
+            
+            resultDiv.className = `result-display ${resultClass}`;
+            resultDiv.innerHTML = resultText;
+        }
+
+        // Hàm nộp bài và tính điểm tổng
+        function submitAll() {
+            // Kiểm tra tất cả các câu
+            let hasEmptyAnswer = false;
+            
+            // Kiểm tra câu 1, 2, 4
+            for (let i of [1, 2, 4]) {
+                const answer = document.getElementById(`answer-input-${i}`).value.trim();
+                if (!answer) {
+                    hasEmptyAnswer = true;
+                }
+            }
+            
+            // Kiểm tra câu 3
+            const answers3 = {
+                a: document.getElementById('answer-input-3a').value.trim(),
+                b: document.getElementById('answer-input-3b').value.trim(),
+                c: document.getElementById('answer-input-3c').value.trim(),
+                d: document.getElementById('answer-input-3d').value.trim()
+            };
+            
+            if (!answers3.a || !answers3.b || !answers3.c || !answers3.d) {
+                hasEmptyAnswer = true;
+            }
+            
+            if (hasEmptyAnswer) {
+                alert('⚠️ Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi nộp bài!');
+                return;
+            }
+            
+            // Kiểm tra từng câu
+            for (let i = 1; i <= 4; i++) {
+                checkAnswer(i);
+            }
+            
+            // Tính tổng điểm
+            let totalScore = 0;
+            
+            for (let i = 1; i <= 4; i++) {
+                if (results[i] !== null) {
+                    totalScore += results[i];
+                }
+            }
+            
+            const finalScore = (totalScore / 4) * 100;
+            const scoreDisplay = document.getElementById('score-display');
+            const scoreText = document.getElementById('score-text');
+            
+            let message = '';
+            if (finalScore >= 90) {
+                message = `Xuất sắc! Em đạt ${Math.round(finalScore)} điểm! 🌟🌟🌟`;
+            } else if (finalScore >= 70) {
+                message = `Tốt lắm! Em đạt ${Math.round(finalScore)} điểm! 🌟🌟`;
+            } else if (finalScore >= 50) {
+                message = `Khá! Em đạt ${Math.round(finalScore)} điểm! 🌟`;
+            } else {
+                message = `Em đạt ${Math.round(finalScore)} điểm. Hãy cố gắng hơn nhé! 💪`;
+            }
+            
+            scoreText.textContent = message;
+            scoreDisplay.className = 'score-display show';
+            
+            // Scroll đến phần hiển thị điểm
+            setTimeout(() => {
+                scoreDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
     </script>
 </body>
