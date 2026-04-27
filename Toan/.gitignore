@@ -1,0 +1,11 @@
+# Ignore config file with API key (for security)
+# Uncomment this line if you want to keep your API key private
+# js/config.js
+
+# Backup files
+*.bak
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

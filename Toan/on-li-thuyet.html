@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Lý Thuyết - Toán Lớp 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="min-h-screen font-['Baloo_2']" style="background: linear-gradient(135deg,#fff 0%,#e0f2fe 100%)">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-sky-500 hover:text-sky-600 font-bold">← Quay lại</a>
+            <h1 class="text-2xl md:text-3xl font-bold text-sky-600">📚 Ôn Lý Thuyết</h1>
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">⭐</span>
+                <span id="totalStars" class="text-xl font-bold text-amber-500">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Ghi Nhớ Công Thức 💡</h2>
+            <p class="text-slate-600 mb-6">Bấm vào thẻ để xem công thức. Học thuộc lòng để làm bài nhanh hơn nhé!</p>
+        </div>
+
+        <!-- Flashcards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Hình học -->
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Chu vi hình chữ nhật?
+                    </div>
+                    <div class="flashcard-back">
+                        C = (dài + rộng) × 2
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Diện tích hình chữ nhật?
+                    </div>
+                    <div class="flashcard-back">
+                        S = dài × rộng
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Chu vi hình vuông?
+                    </div>
+                    <div class="flashcard-back">
+                        C = cạnh × 4
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Diện tích hình vuông?
+                    </div>
+                    <div class="flashcard-back">
+                        S = cạnh × cạnh
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Tìm chiều dài?
+                    </div>
+                    <div class="flashcard-back">
+                        dài = S ÷ rộng
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Tìm cạnh hình vuông?
+                    </div>
+                    <div class="flashcard-back">
+                        cạnh = C ÷ 4
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tìm X -->
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        X + 5 432 = 20 000<br>→ X = ?
+                    </div>
+                    <div class="flashcard-back">
+                        X = 20 000 − 5 432
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        X − 3 200 = 14 500<br>→ X = ?
+                    </div>
+                    <div class="flashcard-back">
+                        X = 14 500 + 3 200
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        25 000 − X = 8 750<br>→ X = ?
+                    </div>
+                    <div class="flashcard-back">
+                        X = 25 000 − 8 750
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        X × 6 = 48 000<br>→ X = ?
+                    </div>
+                    <div class="flashcard-back">
+                        X = 48 000 ÷ 6
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        X ÷ 4 = 12 500<br>→ X = ?
+                    </div>
+                    <div class="flashcard-back">
+                        X = 12 500 × 4
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Thứ tự khi có ngoặc?
+                    </div>
+                    <div class="flashcard-back">
+                        Ngoặc → nhân/chia → cộng/trừ
+                    </div>
+                </div>
+            </div>
+
+            <!-- Đại lượng -->
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1m = ? cm
+                    </div>
+                    <div class="flashcard-back">
+                        1m = 100 cm
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1 km = ? m
+                    </div>
+                    <div class="flashcard-back">
+                        1 km = 1 000 m
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1 kg = ? g
+                    </div>
+                    <div class="flashcard-back">
+                        1 kg = 1 000 g
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1 l = ? ml
+                    </div>
+                    <div class="flashcard-back">
+                        1 l = 1 000 ml
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1 giờ = ? phút
+                    </div>
+                    <div class="flashcard-back">
+                        1 giờ = 60 phút
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1 tuần = ? ngày
+                    </div>
+                    <div class="flashcard-back">
+                        1 tuần = 7 ngày
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        1 năm = ? tháng
+                    </div>
+                    <div class="flashcard-back">
+                        1 năm = 12 tháng
+                    </div>
+                </div>
+            </div>
+
+            <!-- Số La Mã -->
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Số La Mã: XIV = ?
+                    </div>
+                    <div class="flashcard-back">
+                        XIV = 14
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Số La Mã: XIX = ?
+                    </div>
+                    <div class="flashcard-back">
+                        XIX = 19
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        Số La Mã: XXI = ?
+                    </div>
+                    <div class="flashcard-back">
+                        XXI = 21
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="js/progress.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalStars = getTotalStars();
+            document.getElementById('totalStars').textContent = totalStars;
+        });
+    </script>
+</body>
+</html>

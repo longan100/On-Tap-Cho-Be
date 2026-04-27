@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Đọc & Viết Số - Toán Lớp 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+</head>
+<body class="min-h-screen font-['Baloo_2']" style="background: linear-gradient(135deg,#fff 0%,#e0f2fe 100%)">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between mb-3">
+                <a href="../index.html" class="text-sky-500 hover:text-sky-600 font-bold">← Quay lại</a>
+                <h1 class="text-xl md:text-2xl font-bold text-sky-600">Module 1: Đọc & Viết Số</h1>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">⭐</span>
+                    <span id="totalStars" class="text-xl font-bold text-amber-500">0</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                    <div class="module-progress-bar bg-sky-400 h-3 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+                <span class="module-progress-text text-sm font-bold text-slate-600">0/10 câu</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-3xl">
+        
+        <!-- Exercise Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            
+            <!-- Question -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm font-bold text-slate-500">Câu <span id="currentQuestion">1</span>/10</span>
+                    <span class="text-sm font-bold text-sky-500" id="questionType">Số → Chữ</span>
+                </div>
+                <div id="questionText" class="text-2xl md:text-3xl font-bold text-slate-800 mb-6 text-center">
+                    Viết số 74 305 thành chữ
+                </div>
+            </div>
+
+            <!-- Answer Input -->
+            <div class="mb-6">
+                <input type="text" id="answerInput" 
+                       class="input-answer w-full" 
+                       placeholder="Nhập đáp án..."
+                       autocomplete="off">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex flex-wrap gap-3 mb-6">
+                <button onclick="checkAnswer()" class="flex-1 btn-primary">
+                    ✅ Kiểm tra
+                </button>
+                <button onclick="showHint()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl px-6 py-3 transition">
+                    💡 Xem đáp án
+                </button>
+            </div>
+
+            <!-- Feedback -->
+            <div id="feedback" class="hidden"></div>
+
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-6 grid grid-cols-3 gap-4">
+            <div class="bg-white rounded-xl shadow p-4 text-center">
+                <div class="text-3xl font-bold text-green-500" id="correctCount">0</div>
+                <div class="text-sm text-slate-600">Đúng</div>
+            </div>
+            <div class="bg-white rounded-xl shadow p-4 text-center">
+                <div class="text-3xl font-bold text-red-500" id="incorrectCount">0</div>
+                <div class="text-sm text-slate-600">Sai</div>
+            </div>
+            <div class="bg-white rounded-xl shadow p-4 text-center">
+                <div class="text-3xl font-bold text-amber-500" id="starsEarned">0</div>
+                <div class="text-sm text-slate-600">Sao</div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/progress.js"></script>
+    <script src="../js/generator.js"></script>
+    <script src="../js/ai.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        const MODULE_ID = '01-doc-viet-so';
+        const TOTAL_QUESTIONS = 10;
+        
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let starsEarned = 0;
+        let currentQuestion = null;
+        let attempts = 0;
+
+        // Question types
+        const questionTypes = [
+            'so-chu',      // Số → Chữ
+            'chu-so',      // Chữ → Số
+            'gia-tri-hang', // Giá trị hàng
+            'lien-truoc-sau', // Số liền trước/sau
+            'lam-tron',    // Làm tròn
+            'so-sanh',     // So sánh
+            'dien-chu-so', // Điền chữ số vào ô
+            'arab-roman',  // Ả Rập → La Mã
+            'roman-arab',  // La Mã → Ả Rập
+            'sap-xep-roman' // Sắp xếp La Mã
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateHeaderStats();
+            loadQuestion();
+            
+            // Enter key to check answer
+            document.getElementById('answerInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkAnswer();
+            });
+        });
+
+        function loadQuestion() {
+            attempts = 0;
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerInput').className = 'input-answer w-full';
+            
+            const type = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+            currentQuestion = generateQuestion(type);
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionType').textContent = currentQuestion.typeName;
+            document.getElementById('questionText').innerHTML = currentQuestion.question;
+            document.getElementById('answerInput').placeholder = currentQuestion.placeholder || 'Nhập đáp án...';
+            
+            updateProgressBar();
+        }
+
+        function generateQuestion(type) {
+            switch(type) {
+                case 'so-chu':
+                    const so1 = soNgauNhien5Cu();
+                    return {
+                        type: 'so-chu',
+                        typeName: 'Số → Chữ',
+                        question: `Viết số <span class="text-sky-500">${formatNumber(so1)}</span> thành chữ`,
+                        answer: docSo(so1),
+                        placeholder: 'Viết bằng chữ...'
+                    };
+                
+                case 'chu-so':
+                    const so2 = soNgauNhien5Cu();
+                    const chu = docSo(so2);
+                    return {
+                        type: 'chu-so',
+                        typeName: 'Chữ → Số',
+                        question: `Viết thành số: <span class="text-sky-500">${chu}</span>`,
+                        answer: so2,
+                        placeholder: 'Viết bằng số...'
+                    };
+                
+                case 'gia-tri-hang':
+                    const so3 = soNgauNhien5Cu();
+                    const hangs = ['chục nghìn', 'nghìn', 'trăm', 'chục', 'đơn vị'];
+                    const hang = hangs[Math.floor(Math.random() * hangs.length)];
+                    const str = so3.toString().padStart(5, '0');
+                    let chuSoHang;  // Chỉ lấy chữ số, không phải giá trị
+                    switch(hang) {
+                        case 'chục nghìn': chuSoHang = parseInt(str[0]); break;
+                        case 'nghìn': chuSoHang = parseInt(str[1]); break;
+                        case 'trăm': chuSoHang = parseInt(str[2]); break;
+                        case 'chục': chuSoHang = parseInt(str[3]); break;
+                        case 'đơn vị': chuSoHang = parseInt(str[4]); break;
+                    }
+                    return {
+                        type: 'gia-tri-hang',
+                        typeName: 'Giá trị hàng',
+                        question: `Trong số <span class="text-sky-500">${formatNumber(so3)}</span>, giá trị hàng <span class="text-sky-500">${hang}</span> là bao nhiêu?`,
+                        answer: chuSoHang,  // Chỉ trả về chữ số (VD: 3 thay vì 3000)
+                        placeholder: 'Nhập chữ số...'
+                    };
+                
+                case 'lien-truoc-sau':
+                    const so4 = randomInt(10001, 99998);
+                    const loai = Math.random() > 0.5 ? 'trước' : 'sau';
+                    return {
+                        type: 'lien-truoc-sau',
+                        typeName: 'Số liền trước/sau',
+                        question: `Số liền ${loai} số <span class="text-sky-500">${formatNumber(so4)}</span> là`,
+                        answer: loai === 'trước' ? so4 - 1 : so4 + 1,
+                        placeholder: 'Nhập số...'
+                    };
+                
+                case 'lam-tron':
+                    const so5 = soNgauNhien5Cu();
+                    const hangLamTron = ['chục nghìn', 'nghìn'][Math.floor(Math.random() * 2)];
+                    let ketQua;
+                    if (hangLamTron === 'chục nghìn') {
+                        ketQua = Math.round(so5 / 10000) * 10000;
+                    } else {
+                        ketQua = Math.round(so5 / 1000) * 1000;
+                    }
+                    return {
+                        type: 'lam-tron',
+                        typeName: 'Làm tròn',
+                        question: `Làm tròn số <span class="text-sky-500">${formatNumber(so5)}</span> đến hàng <span class="text-sky-500">${hangLamTron}</span>`,
+                        answer: ketQua,
+                        placeholder: 'Nhập số...'
+                    };
+                
+                case 'arab-roman':
+                    const so6 = randomInt(1, 21);
+                    return {
+                        type: 'arab-roman',
+                        typeName: 'Ả Rập → La Mã',
+                        question: `Viết số <span class="text-sky-500">${so6}</span> bằng số La Mã`,
+                        answer: soSangLaMa(so6),
+                        placeholder: 'Viết số La Mã...'
+                    };
+                
+                case 'roman-arab':
+                    const so7 = randomInt(1, 21);
+                    const laMa = soSangLaMa(so7);
+                    return {
+                        type: 'roman-arab',
+                        typeName: 'La Mã → Ả Rập',
+                        question: `Số La Mã <span class="text-sky-500">${laMa}</span> viết bằng số Ả Rập là`,
+                        answer: so7,
+                        placeholder: 'Nhập số...'
+                    };
+                
+                default:
+                    return generateQuestion('so-chu');
+            }
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answerInput');
+            const userAnswer = input.value.trim();
+            
+            if (!userAnswer) {
+                showToast('Hãy nhập đáp án nhé!', 'error');
+                return;
+            }
+            
+            attempts++;
+            let isCorrect = false;
+            
+            // Check answer based on type
+            if (typeof currentQuestion.answer === 'string') {
+                isCorrect = compareStrings(userAnswer, currentQuestion.answer);
+            } else {
+                isCorrect = parseInt(userAnswer) === currentQuestion.answer;
+            }
+            
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                input.className = 'input-answer w-full correct';
+                feedback.className = 'feedback-box success';
+                feedback.innerHTML = `<div class="text-xl font-bold mb-2">🎉 Chính xác!</div>`;
+                feedback.classList.remove('hidden');
+                
+                correctCount++;
+                
+                // Award stars based on attempts
+                let stars = 0;
+                if (attempts === 1) stars = 3;
+                else if (attempts === 2) stars = 2;
+                else stars = 1;
+                
+                starsEarned += stars;
+                showStars(stars);
+                playSound('correct');
+                
+                updateStats();
+                
+                // Next question after delay
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < TOTAL_QUESTIONS) {
+                        loadQuestion();
+                    } else {
+                        finishModule();
+                    }
+                }, 2000);
+                
+            } else {
+                input.className = 'input-answer w-full incorrect';
+                feedback.className = 'feedback-box error';
+                feedback.innerHTML = `
+                    <div class="text-xl font-bold mb-2">❌ Chưa đúng</div>
+                    <div>Thử lại nhé! Hoặc bấm "Gợi ý AI" để được giúp đỡ.</div>
+                `;
+                feedback.classList.remove('hidden');
+                
+                incorrectCount++;
+                playSound('incorrect');
+                updateStats();
+            }
+        }
+
+        function showHint() {
+            if (!currentQuestion) return;
+            
+            let answerText = '';
+            let explanation = '';
+            
+            // Format answer based on type
+            if (typeof currentQuestion.answer === 'string') {
+                answerText = currentQuestion.answer;
+            } else {
+                answerText = formatNumber(currentQuestion.answer);
+            }
+            
+            // Add explanation for some types
+            if (currentQuestion.type === 'so-chu') {
+                explanation = 'Đọc từng hàng: chục nghìn, nghìn, trăm, chục, đơn vị';
+            } else if (currentQuestion.type === 'chu-so') {
+                explanation = 'Viết số theo thứ tự các hàng';
+            } else if (currentQuestion.type === 'gia-tri-hang') {
+                explanation = 'Chỉ cần nhập chữ số ở hàng đó (không phải giá trị đầy đủ)';
+            }
+            
+            showAnswer(answerText, explanation);
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            document.getElementById('starsEarned').textContent = starsEarned;
+        }
+
+        function updateProgressBar() {
+            const percent = Math.round((currentQuestionIndex / TOTAL_QUESTIONS) * 100);
+            document.querySelector('.module-progress-bar').style.width = percent + '%';
+            document.querySelector('.module-progress-text').textContent = `${currentQuestionIndex}/${TOTAL_QUESTIONS} câu`;
+        }
+
+        function finishModule() {
+            saveProgress(MODULE_ID, correctCount, TOTAL_QUESTIONS, starsEarned);
+            
+            showConfetti();
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-content text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4">Hoàn thành!</h2>
+                    <div class="text-xl text-slate-600 mb-6">
+                        Bé đã hoàn thành Module 1<br>
+                        <span class="text-sky-500 font-bold">${correctCount}/${TOTAL_QUESTIONS}</span> câu đúng<br>
+                        Nhận được <span class="text-amber-500 font-bold">${starsEarned} ⭐</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="../index.html" class="flex-1 bg-gray-300 hover:bg-gray-400 text-slate-700 font-bold rounded-xl px-6 py-3 transition text-center">
+                            Về trang chủ
+                        </a>
+                        <button onclick="location.reload()" class="flex-1 bg-sky-400 hover:bg-sky-500 text-white font-bold rounded-xl px-6 py-3 transition">
+                            Làm lại
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+    </script>
+</body>
+</html>

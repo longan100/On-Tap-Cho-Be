@@ -83,6 +83,18 @@ function loadData() {
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
+            
+            // Kiểm tra ngày - nếu khác ngày thì reset trạng thái hoàn thành
+            const today = new Date().toDateString();
+            const savedDate = parsed.lastCompletionDate || '';
+            
+            if (savedDate !== today) {
+                // Reset trạng thái hoàn thành của các bảng nhân/chia
+                parsed.multiply = { 2:false, 3:false, 4:false, 5:false, 6:false, 7:false, 8:false, 9:false };
+                parsed.divide = { 2:false, 3:false, 4:false, 5:false, 6:false, 7:false, 8:false, 9:false };
+                parsed.lastCompletionDate = today;
+            }
+            
             // Ensure opStats exists with defaults
             const defaultOpStats = {
                 add: { correct: 0, wrong: 0 },
@@ -99,7 +111,12 @@ function loadData() {
 }
 
 function saveData() {
-    localStorage.setItem('cuuChuongProgress', JSON.stringify(state.tableProgress));
+    // Lưu kèm ngày hiện tại
+    const dataToSave = {
+        ...state.tableProgress,
+        lastCompletionDate: new Date().toDateString()
+    };
+    localStorage.setItem('cuuChuongProgress', JSON.stringify(dataToSave));
 }
 
 function resetAllData() {
@@ -977,14 +994,16 @@ document.addEventListener('keydown', (e) => {
 function trackOpStat(isCorrect) {
     let opKey = null;
     
+    // Chỉ track cho các mode nâng cao và quiz, KHÔNG track cho bảng cửu chương (multiply/divide)
     if (state.mode === 'add') opKey = 'add';
     else if (state.mode === 'subtract') opKey = 'subtract';
-    else if (state.mode === 'multiply_adv' || state.mode === 'multiply') opKey = 'multiply_adv';
-    else if (state.mode === 'divide_adv' || state.mode === 'divide') opKey = 'divide_adv';
+    else if (state.mode === 'multiply_adv') opKey = 'multiply_adv';
+    else if (state.mode === 'divide_adv') opKey = 'divide_adv';
     else if (state.mode === 'quiz') {
         const q = state.questions[state.currentQuestionIndex];
         if (q) opKey = q.operation;
     }
+    // Bỏ qua state.mode === 'multiply' và state.mode === 'divide'
     
     if (opKey && state.tableProgress.opStats[opKey]) {
         if (isCorrect) {
