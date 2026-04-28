@@ -263,6 +263,191 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
+        .sidebar {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar-header h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .sidebar-content {
+            padding: 15px;
+        }
+
+        .question-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .question-item:hover {
+            background: #f8f9ff;
+            transform: translateX(-5px);
+        }
+
+        .question-item.answered {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .question-item.unanswered {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .question-item.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .question-item.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .question-item.partial {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .question-number-badge {
+            min-width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #a8edea;
+            color: #333;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .question-item.answered .question-number-badge {
+            background: #28a745;
+            color: white;
+        }
+
+        .question-item.unanswered .question-number-badge {
+            background: #ffc107;
+            color: white;
+        }
+
+        .question-item.correct .question-number-badge {
+            background: #28a745;
+            color: white;
+        }
+
+        .question-item.incorrect .question-number-badge {
+            background: #dc3545;
+            color: white;
+        }
+
+        .question-item.partial .question-number-badge {
+            background: #ffc107;
+            color: white;
+        }
+
+        .question-status {
+            flex: 1;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .question-icon {
+            font-size: 18px;
+        }
+
+        .toggle-sidebar-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(168, 237, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-sidebar-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(168, 237, 234, 0.6);
+        }
+
+        .close-sidebar-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #333;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-sidebar-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 22px;
@@ -278,6 +463,17 @@
 
             .navigation {
                 flex-direction: column;
+            }
+
+            .sidebar {
+                width: 280px;
+                right: -280px;
+            }
+
+            .toggle-sidebar-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
     </style>
@@ -359,6 +555,26 @@
         </div>
     </div>
 
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+            <h3>📋 Danh sách câu hỏi</h3>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">✅ <span id="answeredCount">0</span></div>
+                <div class="stat-item">⚠️ <span id="unansweredCount">4</span></div>
+            </div>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <!-- Danh sách câu hỏi sẽ được tạo bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+        📊
+    </button>
+
     <script>
         // Đáp án chuẩn cho từng câu hỏi
         const correctAnswers = {
@@ -401,6 +617,126 @@
             3: null,
             4: null
         };
+
+        let isSubmitted = false;
+
+        // Khởi tạo sidebar
+        function initSidebar() {
+            updateSidebarPreview();
+            
+            // Thêm event listener cho các textarea
+            document.querySelectorAll('.answer-area').forEach(textarea => {
+                textarea.addEventListener('input', updateSidebarPreview);
+            });
+        }
+
+        // Hàm toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Hàm cập nhật sidebar preview
+        function updateSidebarPreview() {
+            const sidebarContent = document.getElementById('sidebarContent');
+            sidebarContent.innerHTML = '';
+            
+            let answeredCount = 0;
+            let unansweredCount = 0;
+            
+            const questions = [
+                { id: 1, label: 'Câu 1' },
+                { id: 2, label: 'Câu 2' },
+                { id: 3, label: 'Câu 3 (a,b,c,d)' },
+                { id: 4, label: 'Câu 4' }
+            ];
+            
+            questions.forEach(q => {
+                const item = document.createElement('div');
+                item.className = 'question-item';
+                
+                let status = '';
+                let icon = '';
+                let hasAnswer = false;
+                
+                if (isSubmitted && results[q.id] !== null) {
+                    // Sau khi nộp bài
+                    if (results[q.id] === 1) {
+                        item.classList.add('correct');
+                        status = 'Đúng';
+                        icon = '✅';
+                    } else if (results[q.id] === 0.5) {
+                        item.classList.add('partial');
+                        status = 'Được một phần';
+                        icon = '⚠️';
+                    } else {
+                        item.classList.add('incorrect');
+                        status = 'Sai';
+                        icon = '❌';
+                    }
+                } else {
+                    // Trước khi nộp bài
+                    if (q.id === 3) {
+                        const answers = {
+                            a: document.getElementById('answer-input-3a')?.value.trim(),
+                            b: document.getElementById('answer-input-3b')?.value.trim(),
+                            c: document.getElementById('answer-input-3c')?.value.trim(),
+                            d: document.getElementById('answer-input-3d')?.value.trim()
+                        };
+                        hasAnswer = answers.a && answers.b && answers.c && answers.d;
+                    } else {
+                        const answer = document.getElementById(`answer-input-${q.id}`)?.value.trim();
+                        hasAnswer = answer && answer.length > 0;
+                    }
+                    
+                    if (hasAnswer) {
+                        item.classList.add('answered');
+                        status = 'Đã trả lời';
+                        icon = '✅';
+                        answeredCount++;
+                    } else {
+                        item.classList.add('unanswered');
+                        status = 'Chưa trả lời';
+                        icon = '⚠️';
+                        unansweredCount++;
+                    }
+                }
+                
+                item.innerHTML = `
+                    <div class="question-number-badge">${q.id}</div>
+                    <div class="question-status">${status}</div>
+                    <div class="question-icon">${icon}</div>
+                `;
+                
+                item.onclick = () => scrollToQuestion(q.id);
+                sidebarContent.appendChild(item);
+            });
+            
+            // Cập nhật thống kê
+            if (!isSubmitted) {
+                document.getElementById('answeredCount').textContent = answeredCount;
+                document.getElementById('unansweredCount').textContent = unansweredCount;
+            }
+        }
+
+        // Hàm cuộn đến câu hỏi
+        function scrollToQuestion(questionId) {
+            const questionCards = document.querySelectorAll('.question-card');
+            if (questionCards[questionId - 1]) {
+                questionCards[questionId - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Highlight câu hỏi
+                questionCards[questionId - 1].style.boxShadow = '0 0 20px rgba(168, 237, 234, 0.8)';
+                setTimeout(() => {
+                    questionCards[questionId - 1].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                }, 2000);
+            }
+            
+            // Đóng sidebar trên mobile
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
 
         // Hàm chuẩn hóa chuỗi (loại bỏ dấu, chuyển thường)
         function normalizeString(str) {
@@ -537,6 +873,9 @@
                 checkAnswer(i);
             }
             
+            // Đánh dấu đã nộp bài
+            isSubmitted = true;
+            
             // Tính tổng điểm
             let totalScore = 0;
             
@@ -564,11 +903,17 @@
             scoreText.textContent = message;
             scoreDisplay.className = 'score-display show';
             
+            // Cập nhật sidebar
+            updateSidebarPreview();
+            
             // Scroll đến phần hiển thị điểm
             setTimeout(() => {
                 scoreDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
+
+        // Khởi tạo khi trang load
+        window.onload = initSidebar;
     </script>
 </body>
 </html>

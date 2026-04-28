@@ -205,6 +205,8 @@ function shuffleArray(array) {
 
 // Biến lưu trữ câu hỏi đã xáo trộn
 let shuffledQuestions = [];
+let currentFilter = 'all';
+let quizSubmitted = false;
 
 const form = document.getElementById('quizForm');
 const resultBox = document.getElementById('resultBox');
@@ -263,7 +265,7 @@ function renderQuestions() {
             const inputType = q.isMultiple ? 'checkbox' : 'radio';
             
             html += `<label class="option">`;
-            html += `<input type="${inputType}" name="q${index}" value="${optIndex}">`;
+            html += `<input type="${inputType}" name="q${index}" value="${optIndex}" onchange="updateSidebarPreview()">`;
             html += `<span class="option-text">${letter}. `;
             
             if (q.hasImage && option.image) {
@@ -279,6 +281,9 @@ function renderQuestions() {
         questionCard.innerHTML = html;
         form.appendChild(questionCard);
     });
+    
+    // Khởi tạo sidebar preview
+    updateSidebarPreview();
 }
 
 form.addEventListener('submit', function(e) {
@@ -286,6 +291,7 @@ form.addEventListener('submit', function(e) {
     
     let score = 0;
     const totalQuestions = shuffledQuestions.length;
+    quizSubmitted = true;
     
     // Kiểm tra từng câu hỏi
     shuffledQuestions.forEach((q, index) => {
@@ -297,6 +303,9 @@ form.addEventListener('submit', function(e) {
             
             const correctAnswers = [...q.answer].sort();
             const isCorrect = JSON.stringify(selectedAnswers) === JSON.stringify(correctAnswers);
+            
+            q.userAnswer = selectedAnswers;
+            q.isCorrect = isCorrect;
             
             if (isCorrect) {
                 score++;
@@ -317,7 +326,10 @@ form.addEventListener('submit', function(e) {
             // Câu hỏi đơn (radio button)
             const selectedAnswer = document.querySelector(`input[name="q${index}"]:checked`);
             
-            if (selectedAnswer && parseInt(selectedAnswer.value) === q.answer) {
+            q.userAnswer = selectedAnswer ? parseInt(selectedAnswer.value) : null;
+            q.isCorrect = selectedAnswer && parseInt(selectedAnswer.value) === q.answer;
+            
+            if (q.isCorrect) {
                 score++;
             }
             
@@ -361,6 +373,9 @@ form.addEventListener('submit', function(e) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đã nộp bài';
     
+    // Cập nhật sidebar
+    updateSidebar();
+    
     // Cuộn xuống kết quả
     setTimeout(() => {
         resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -376,11 +391,180 @@ function resetQuiz() {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Nộp bài';
     
+    // Đóng sidebar
+    document.getElementById('sidebar').classList.remove('open');
+    
+    // Reset trạng thái
+    quizSubmitted = false;
+    currentFilter = 'all';
+    
     // Khởi tạo lại quiz với câu hỏi và đáp án được xáo trộn mới
     initQuiz();
     
     // Cuộn lên đầu trang
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Hàm toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
+
+// Hàm cập nhật sidebar preview (trước khi nộp bài)
+function updateSidebarPreview() {
+    if (quizSubmitted) return;
+    
+    const sidebarContent = document.getElementById('sidebarContent');
+    sidebarContent.innerHTML = '';
+    
+    let answeredCount = 0;
+    let unansweredCount = 0;
+    
+    shuffledQuestions.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        
+        let status = '';
+        let icon = '';
+        let hasAnswer = false;
+        
+        if (q.isMultiple) {
+            const selectedAnswers = document.querySelectorAll(`input[name="q${index}"]:checked`);
+            hasAnswer = selectedAnswers.length > 0;
+        } else {
+            const selectedAnswer = document.querySelector(`input[name="q${index}"]:checked`);
+            hasAnswer = selectedAnswer !== null;
+        }
+        
+        if (hasAnswer) {
+            item.classList.add('correct');
+            status = 'Đã trả lời';
+            icon = '✅';
+            answeredCount++;
+        } else {
+            item.classList.add('unanswered');
+            status = 'Chưa trả lời';
+            icon = '⚠️';
+            unansweredCount++;
+        }
+        
+        item.innerHTML = `
+            <div class="question-number-badge">${index + 1}</div>
+            <div class="question-status">${status}</div>
+            <div class="question-icon">${icon}</div>
+        `;
+        
+        item.onclick = () => scrollToQuestion(index);
+        sidebarContent.appendChild(item);
+    });
+    
+    // Cập nhật thống kê
+    document.getElementById('correctCount').textContent = answeredCount;
+    document.getElementById('incorrectCount').textContent = '0';
+    document.getElementById('unansweredCount').textContent = unansweredCount;
+}
+
+// Hàm cập nhật sidebar (sau khi nộp bài)
+function updateSidebar() {
+    const sidebarContent = document.getElementById('sidebarContent');
+    sidebarContent.innerHTML = '';
+    
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unansweredCount = 0;
+    
+    shuffledQuestions.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        
+        let status = '';
+        let icon = '';
+        
+        if (q.userAnswer === null || (Array.isArray(q.userAnswer) && q.userAnswer.length === 0)) {
+            item.classList.add('unanswered');
+            status = 'Chưa trả lời';
+            icon = '⚠️';
+            unansweredCount++;
+        } else if (q.isCorrect) {
+            item.classList.add('correct');
+            status = 'Đúng';
+            icon = '✅';
+            correctCount++;
+        } else {
+            item.classList.add('incorrect');
+            status = 'Sai';
+            icon = '❌';
+            incorrectCount++;
+        }
+        
+        item.innerHTML = `
+            <div class="question-number-badge">${index + 1}</div>
+            <div class="question-status">${status}</div>
+            <div class="question-icon">${icon}</div>
+        `;
+        
+        item.onclick = () => scrollToQuestion(index);
+        sidebarContent.appendChild(item);
+    });
+    
+    // Cập nhật thống kê
+    document.getElementById('correctCount').textContent = correctCount;
+    document.getElementById('incorrectCount').textContent = incorrectCount;
+    document.getElementById('unansweredCount').textContent = unansweredCount;
+    
+    // Áp dụng filter hiện tại
+    filterQuestions(currentFilter);
+}
+
+// Hàm lọc câu hỏi
+function filterQuestions(filter) {
+    currentFilter = filter;
+    const items = document.querySelectorAll('.question-item');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    // Cập nhật trạng thái nút filter
+    filterBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.includes('Tất cả') && filter === 'all') {
+            btn.classList.add('active');
+        } else if (btn.textContent.includes('Sai') && filter === 'incorrect') {
+            btn.classList.add('active');
+        } else if (btn.textContent.includes('Chưa') && filter === 'unanswered') {
+            btn.classList.add('active');
+        }
+    });
+    
+    items.forEach(item => {
+        if (filter === 'all') {
+            item.style.display = 'flex';
+        } else if (filter === 'incorrect' && item.classList.contains('incorrect')) {
+            item.style.display = 'flex';
+        } else if (filter === 'unanswered' && item.classList.contains('unanswered')) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Hàm cuộn đến câu hỏi
+function scrollToQuestion(index) {
+    const questionCards = document.querySelectorAll('.question-card');
+    if (questionCards[index]) {
+        questionCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight câu hỏi
+        questionCards[index].style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.6)';
+        setTimeout(() => {
+            questionCards[index].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+        }, 2000);
+    }
+    
+    // Đóng sidebar trên mobile
+    if (window.innerWidth <= 768) {
+        toggleSidebar();
+    }
 }
 
 // Khởi tạo quiz khi trang tải

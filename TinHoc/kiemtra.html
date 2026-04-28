@@ -313,6 +313,202 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
+        .sidebar {
+            position: fixed;
+            right: -320px;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar-header h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .sidebar-section {
+            padding: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .sidebar-section h4 {
+            font-size: 14px;
+            color: #11998e;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .sidebar-content {
+            padding: 0;
+        }
+
+        .question-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .question-item:hover {
+            background: #f8f9ff;
+            border-left-color: #11998e;
+        }
+
+        .question-item.answered {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .question-item.unanswered {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .question-item.correct {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .question-item.incorrect {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .question-item.partial {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .question-number-badge {
+            min-width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0e0e0;
+            color: #333;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .question-item.answered .question-number-badge {
+            background: #28a745;
+            color: white;
+        }
+
+        .question-item.unanswered .question-number-badge {
+            background: #ffc107;
+            color: white;
+        }
+
+        .question-item.correct .question-number-badge {
+            background: #28a745;
+            color: white;
+        }
+
+        .question-item.incorrect .question-number-badge {
+            background: #dc3545;
+            color: white;
+        }
+
+        .question-item.partial .question-number-badge {
+            background: #ffc107;
+            color: white;
+        }
+
+        .question-status {
+            flex: 1;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .question-icon {
+            font-size: 16px;
+        }
+
+        .toggle-sidebar-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-sidebar-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.6);
+        }
+
+        .close-sidebar-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 22px;
@@ -328,6 +524,17 @@
 
             .navigation {
                 flex-direction: column;
+            }
+
+            .sidebar {
+                width: 300px;
+                right: -300px;
+            }
+
+            .toggle-sidebar-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
     </style>
@@ -370,6 +577,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+            <h3>📋 Danh sách câu hỏi</h3>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">✅ <span id="answeredCount">0</span></div>
+                <div class="stat-item">⚠️ <span id="unansweredCount">20</span></div>
+            </div>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <!-- Danh sách câu hỏi sẽ được tạo bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+        📊
+    </button>
 
     <script src="kiemtra.js"></script>
 </body>

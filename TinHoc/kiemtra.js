@@ -258,6 +258,7 @@ function shuffleArray(array) {
 // Biến lưu trữ câu hỏi đã xáo trộn
 let shuffledTracnghiem = [];
 let tuluanResults = {};
+let isSubmitted = false;
 
 // Khởi tạo trắc nghiệm
 function initTracnghiem() {
@@ -528,6 +529,9 @@ document.getElementById('submitBtn').addEventListener('click', function() {
         return;
     }
     
+    // Đánh dấu đã nộp bài
+    isSubmitted = true;
+    
     // Chấm điểm
     const tnScore = checkTracnghiem();
     const tlScore = checkTuluan();
@@ -561,6 +565,9 @@ document.getElementById('submitBtn').addEventListener('click', function() {
     this.disabled = true;
     this.textContent = 'Đã nộp bài';
     
+    // Cập nhật sidebar
+    updateSidebarPreview();
+    
     // Cuộn xuống kết quả
     setTimeout(() => {
         document.getElementById('score-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -571,4 +578,209 @@ document.getElementById('submitBtn').addEventListener('click', function() {
 window.onload = function() {
     initTracnghiem();
     initTuluan();
+    initSidebar();
 };
+
+// Hàm toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
+
+// Khởi tạo sidebar
+function initSidebar() {
+    updateSidebarPreview();
+    
+    // Thêm event listener cho các input trắc nghiệm
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'radio' || e.target.type === 'checkbox') {
+            updateSidebarPreview();
+        }
+    });
+    
+    // Thêm event listener cho các textarea tự luận
+    document.querySelectorAll('.answer-area').forEach(textarea => {
+        textarea.addEventListener('input', updateSidebarPreview);
+    });
+}
+
+// Hàm cập nhật sidebar preview
+function updateSidebarPreview() {
+    const sidebarContent = document.getElementById('sidebarContent');
+    sidebarContent.innerHTML = '';
+    
+    let answeredCount = 0;
+    let unansweredCount = 0;
+    
+    // Phần trắc nghiệm
+    const tnSection = document.createElement('div');
+    tnSection.className = 'sidebar-section';
+    tnSection.innerHTML = '<h4>📝 TRẮC NGHIỆM (16 câu)</h4>';
+    
+    shuffledTracnghiem.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        
+        let status = '';
+        let icon = '';
+        let hasAnswer = false;
+        
+        if (isSubmitted) {
+            // Sau khi nộp bài - kiểm tra kết quả
+            const resultDiv = document.getElementById(`tn-result-${index}`);
+            if (resultDiv && resultDiv.classList.contains('correct')) {
+                item.classList.add('correct');
+                status = 'Đúng';
+                icon = '✅';
+            } else if (resultDiv && resultDiv.classList.contains('incorrect')) {
+                item.classList.add('incorrect');
+                status = 'Sai';
+                icon = '❌';
+            }
+        } else {
+            // Trước khi nộp bài
+            if (q.isMultiple) {
+                const checked = document.querySelectorAll(`input[name="tn${index}"]:checked`);
+                hasAnswer = checked.length > 0;
+            } else {
+                const checked = document.querySelector(`input[name="tn${index}"]:checked`);
+                hasAnswer = checked !== null;
+            }
+            
+            if (hasAnswer) {
+                item.classList.add('answered');
+                status = 'Đã trả lời';
+                icon = '✅';
+                answeredCount++;
+            } else {
+                item.classList.add('unanswered');
+                status = 'Chưa trả lời';
+                icon = '⚠️';
+                unansweredCount++;
+            }
+        }
+        
+        item.innerHTML = `
+            <div class="question-number-badge">${index + 1}</div>
+            <div class="question-status">${status}</div>
+            <div class="question-icon">${icon}</div>
+        `;
+        
+        item.onclick = () => scrollToTracnghiem(index);
+        tnSection.appendChild(item);
+    });
+    
+    sidebarContent.appendChild(tnSection);
+    
+    // Phần tự luận
+    const tlSection = document.createElement('div');
+    tlSection.className = 'sidebar-section';
+    tlSection.innerHTML = '<h4>✍️ TỰ LUẬN (4 câu)</h4>';
+    
+    tuluanData.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        
+        let status = '';
+        let icon = '';
+        let hasAnswer = false;
+        
+        if (isSubmitted) {
+            // Sau khi nộp bài
+            const resultDiv = document.getElementById(`tl-result-${index}`);
+            if (resultDiv && resultDiv.classList.contains('correct')) {
+                item.classList.add('correct');
+                status = 'Đúng';
+                icon = '✅';
+            } else if (resultDiv && resultDiv.classList.contains('partial')) {
+                item.classList.add('partial');
+                status = 'Được phần';
+                icon = '⚠️';
+            } else if (resultDiv && resultDiv.classList.contains('incorrect')) {
+                item.classList.add('incorrect');
+                status = 'Sai';
+                icon = '❌';
+            }
+        } else {
+            // Trước khi nộp bài
+            if (q.subQuestions) {
+                let allAnswered = true;
+                q.subQuestions.forEach(sub => {
+                    const answer = document.getElementById(`tl-${index}-${sub.id}`)?.value.trim();
+                    if (!answer) allAnswered = false;
+                });
+                hasAnswer = allAnswered;
+            } else {
+                const answer = document.getElementById(`tl-${index}`)?.value.trim();
+                hasAnswer = answer && answer.length > 0;
+            }
+            
+            if (hasAnswer) {
+                item.classList.add('answered');
+                status = 'Đã trả lời';
+                icon = '✅';
+                answeredCount++;
+            } else {
+                item.classList.add('unanswered');
+                status = 'Chưa trả lời';
+                icon = '⚠️';
+                unansweredCount++;
+            }
+        }
+        
+        item.innerHTML = `
+            <div class="question-number-badge">TL${index + 1}</div>
+            <div class="question-status">${status}</div>
+            <div class="question-icon">${icon}</div>
+        `;
+        
+        item.onclick = () => scrollToTuluan(index);
+        tlSection.appendChild(item);
+    });
+    
+    sidebarContent.appendChild(tlSection);
+    
+    // Cập nhật thống kê
+    if (!isSubmitted) {
+        document.getElementById('answeredCount').textContent = answeredCount;
+        document.getElementById('unansweredCount').textContent = unansweredCount;
+    }
+}
+
+// Hàm cuộn đến câu trắc nghiệm
+function scrollToTracnghiem(index) {
+    const questionCards = document.querySelectorAll('#tracnghiemForm .question-card');
+    if (questionCards[index]) {
+        questionCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight câu hỏi
+        questionCards[index].style.boxShadow = '0 0 20px rgba(17, 153, 142, 0.8)';
+        setTimeout(() => {
+            questionCards[index].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+        }, 2000);
+    }
+    
+    // Đóng sidebar trên mobile
+    if (window.innerWidth <= 768) {
+        toggleSidebar();
+    }
+}
+
+// Hàm cuộn đến câu tự luận
+function scrollToTuluan(index) {
+    const questionCards = document.querySelectorAll('#tuluanForm .question-card');
+    if (questionCards[index]) {
+        questionCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight câu hỏi
+        questionCards[index].style.boxShadow = '0 0 20px rgba(17, 153, 142, 0.8)';
+        setTimeout(() => {
+            questionCards[index].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+        }, 2000);
+    }
+    
+    // Đóng sidebar trên mobile
+    if (window.innerWidth <= 768) {
+        toggleSidebar();
+    }
+}

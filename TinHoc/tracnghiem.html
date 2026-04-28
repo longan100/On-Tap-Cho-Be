@@ -226,6 +226,191 @@
             transform: scale(1.05);
         }
 
+        .sidebar {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar-header h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .sidebar-filters {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .sidebar-content {
+            padding: 15px;
+        }
+
+        .question-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .question-item:hover {
+            background: #f8f9ff;
+            transform: translateX(-5px);
+        }
+
+        .question-item.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .question-item.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .question-item.unanswered {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .question-number-badge {
+            min-width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .question-item.correct .question-number-badge {
+            background: #28a745;
+        }
+
+        .question-item.incorrect .question-number-badge {
+            background: #dc3545;
+        }
+
+        .question-item.unanswered .question-number-badge {
+            background: #ffc107;
+        }
+
+        .question-status {
+            flex: 1;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .question-icon {
+            font-size: 18px;
+        }
+
+        .toggle-sidebar-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-sidebar-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .close-sidebar-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 22px;
@@ -237,6 +422,17 @@
 
             .quiz-content {
                 padding: 20px;
+            }
+
+            .sidebar {
+                width: 280px;
+                right: -280px;
+            }
+
+            .toggle-sidebar-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
     </style>
@@ -263,6 +459,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+            <h3>📋 Danh sách câu hỏi</h3>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">✅ <span id="correctCount">0</span></div>
+                <div class="stat-item">❌ <span id="incorrectCount">0</span></div>
+                <div class="stat-item">⚠️ <span id="unansweredCount">0</span></div>
+            </div>
+            <div class="sidebar-filters">
+                <button class="filter-btn active" onclick="filterQuestions('all')">Tất cả</button>
+                <button class="filter-btn" onclick="filterQuestions('incorrect')">Sai</button>
+                <button class="filter-btn" onclick="filterQuestions('unanswered')">Chưa trả lời</button>
+            </div>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <!-- Danh sách câu hỏi sẽ được tạo bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+        📊
+    </button>
 
     <script src="tracnghiem.js"></script>
 </body>
