@@ -217,6 +217,8 @@ function shuffleArray(array) {
 // Biến lưu trữ câu hỏi đã xáo trộn và mapping đáp án
 let shuffledQuestions = [];
 let answerMapping = {}; // Lưu vị trí đáp án đúng sau khi xáo trộn
+let currentFilter = 'all';
+let quizSubmitted = false;
 
 // Hàm khởi tạo quiz
 function initQuiz() {
@@ -283,6 +285,7 @@ function renderQuestions() {
 function submitQuiz() {
     let score = 0;
     const totalQuestions = shuffledQuestions.length;
+    quizSubmitted = true;
     
     // Kiểm tra từng câu hỏi
     shuffledQuestions.forEach((q, index) => {
@@ -291,6 +294,11 @@ function submitQuiz() {
         
         if (selectedAnswer && parseInt(selectedAnswer.value) === q.answer) {
             score++;
+            q.userAnswer = parseInt(selectedAnswer.value);
+            q.isCorrect = true;
+        } else {
+            q.userAnswer = selectedAnswer ? parseInt(selectedAnswer.value) : null;
+            q.isCorrect = false;
         }
         
         // Đánh dấu các đáp án
@@ -332,6 +340,10 @@ function submitQuiz() {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đã nộp bài';
     
+    // Hiển thị nút toggle sidebar và cập nhật sidebar
+    document.getElementById('toggleBtn').classList.add('show');
+    updateSidebar();
+    
     // Cuộn lên đầu trang để xem kết quả
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -346,11 +358,119 @@ function resetQuiz() {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Nộp bài';
     
+    // Ẩn nút toggle sidebar
+    document.getElementById('toggleBtn').classList.remove('show');
+    document.getElementById('sidebar').classList.remove('open');
+    
+    // Reset trạng thái
+    quizSubmitted = false;
+    currentFilter = 'all';
+    
     // Khởi tạo lại quiz với câu hỏi và đáp án được xáo trộn mới
     initQuiz();
     
     // Cuộn lên đầu trang
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Hàm toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('open');
+}
+
+// Hàm cập nhật sidebar
+function updateSidebar() {
+    const sidebarContent = document.getElementById('sidebarContent');
+    sidebarContent.innerHTML = '';
+    
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unansweredCount = 0;
+    
+    shuffledQuestions.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        
+        let status = '';
+        let icon = '';
+        
+        if (q.userAnswer === null) {
+            item.classList.add('unanswered');
+            status = 'Chưa trả lời';
+            icon = '⚠️';
+            unansweredCount++;
+        } else if (q.isCorrect) {
+            item.classList.add('correct');
+            status = 'Đúng';
+            icon = '✅';
+            correctCount++;
+        } else {
+            item.classList.add('incorrect');
+            status = 'Sai';
+            icon = '❌';
+            incorrectCount++;
+        }
+        
+        item.innerHTML = `
+            <div class="question-number-badge">${index + 1}</div>
+            <div class="question-status">${status}</div>
+            <div class="question-icon">${icon}</div>
+        `;
+        
+        item.onclick = () => scrollToQuestion(index);
+        sidebarContent.appendChild(item);
+    });
+    
+    // Cập nhật thống kê
+    document.getElementById('correctCount').textContent = correctCount;
+    document.getElementById('incorrectCount').textContent = incorrectCount;
+    document.getElementById('unansweredCount').textContent = unansweredCount;
+    
+    // Áp dụng filter hiện tại
+    filterQuestions(currentFilter);
+}
+
+// Hàm lọc câu hỏi
+function filterQuestions(filter) {
+    currentFilter = filter;
+    const items = document.querySelectorAll('.question-item');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    // Cập nhật trạng thái nút filter
+    filterBtns.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    items.forEach(item => {
+        if (filter === 'all') {
+            item.style.display = 'flex';
+        } else if (filter === 'incorrect' && item.classList.contains('incorrect')) {
+            item.style.display = 'flex';
+        } else if (filter === 'unanswered' && item.classList.contains('unanswered')) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Hàm cuộn đến câu hỏi
+function scrollToQuestion(index) {
+    const questionCards = document.querySelectorAll('.question-card');
+    if (questionCards[index]) {
+        questionCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight câu hỏi
+        questionCards[index].style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.6)';
+        setTimeout(() => {
+            questionCards[index].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+        }, 2000);
+    }
+    
+    // Đóng sidebar trên mobile
+    if (window.innerWidth <= 768) {
+        toggleSidebar();
+    }
 }
 
 // Khởi tạo quiz khi trang tải
