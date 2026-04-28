@@ -269,7 +269,7 @@ function renderQuestions() {
             const letter = String.fromCharCode(65 + optIndex); // A, B, C, D...
             html += `
                 <label class="option">
-                    <input type="radio" name="q${index}" value="${optIndex}">
+                    <input type="radio" name="q${index}" value="${optIndex}" onchange="updateSidebarPreview()">
                     <span class="option-text">${letter}. ${option}</span>
                 </label>
             `;
@@ -279,6 +279,9 @@ function renderQuestions() {
         questionCard.innerHTML = html;
         form.appendChild(questionCard);
     });
+    
+    // Khởi tạo sidebar preview
+    updateSidebarPreview();
 }
 
 // Hàm nộp bài
@@ -340,8 +343,7 @@ function submitQuiz() {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đã nộp bài';
     
-    // Hiển thị nút toggle sidebar và cập nhật sidebar
-    document.getElementById('toggleBtn').classList.add('show');
+    // Cập nhật sidebar
     updateSidebar();
     
     // Cuộn lên đầu trang để xem kết quả
@@ -358,8 +360,7 @@ function resetQuiz() {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Nộp bài';
     
-    // Ẩn nút toggle sidebar
-    document.getElementById('toggleBtn').classList.remove('show');
+    // Đóng sidebar
     document.getElementById('sidebar').classList.remove('open');
     
     // Reset trạng thái
@@ -379,7 +380,55 @@ function toggleSidebar() {
     sidebar.classList.toggle('open');
 }
 
-// Hàm cập nhật sidebar
+// Hàm cập nhật sidebar preview (trước khi nộp bài)
+function updateSidebarPreview() {
+    if (quizSubmitted) return;
+    
+    const sidebarContent = document.getElementById('sidebarContent');
+    sidebarContent.innerHTML = '';
+    
+    let answeredCount = 0;
+    let unansweredCount = 0;
+    
+    shuffledQuestions.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        
+        let status = '';
+        let icon = '';
+        
+        const selectedAnswer = document.querySelector(`input[name="q${index}"]:checked`);
+        const hasAnswer = selectedAnswer !== null;
+        
+        if (hasAnswer) {
+            item.classList.add('correct');
+            status = 'Đã trả lời';
+            icon = '✅';
+            answeredCount++;
+        } else {
+            item.classList.add('unanswered');
+            status = 'Chưa trả lời';
+            icon = '⚠️';
+            unansweredCount++;
+        }
+        
+        item.innerHTML = `
+            <div class="question-number-badge">${index + 1}</div>
+            <div class="question-status">${status}</div>
+            <div class="question-icon">${icon}</div>
+        `;
+        
+        item.onclick = () => scrollToQuestion(index);
+        sidebarContent.appendChild(item);
+    });
+    
+    // Cập nhật thống kê
+    document.getElementById('correctCount').textContent = answeredCount;
+    document.getElementById('incorrectCount').textContent = '0';
+    document.getElementById('unansweredCount').textContent = unansweredCount;
+}
+
+// Hàm cập nhật sidebar (sau khi nộp bài)
 function updateSidebar() {
     const sidebarContent = document.getElementById('sidebarContent');
     sidebarContent.innerHTML = '';
@@ -438,8 +487,16 @@ function filterQuestions(filter) {
     const filterBtns = document.querySelectorAll('.filter-btn');
     
     // Cập nhật trạng thái nút filter
-    filterBtns.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    filterBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.includes('Tất cả') && filter === 'all') {
+            btn.classList.add('active');
+        } else if (btn.textContent.includes('Sai') && filter === 'incorrect') {
+            btn.classList.add('active');
+        } else if (btn.textContent.includes('Chưa') && filter === 'unanswered') {
+            btn.classList.add('active');
+        }
+    });
     
     items.forEach(item => {
         if (filter === 'all') {
