@@ -441,6 +441,90 @@ body {
     gap: 5px;
 }
 
+/* Mic Controls */
+.mic-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.mic-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.mic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+}
+
+.mic-btn.recording {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 3px 10px rgba(245, 87, 108, 0.3);
+    }
+    50% {
+        box-shadow: 0 5px 20px rgba(245, 87, 108, 0.8);
+    }
+}
+
+.mic-icon {
+    font-size: 18px;
+}
+
+.mic-text {
+    font-size: 14px;
+}
+
+.mic-status {
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.mic-status.listening {
+    color: #f5576c;
+    font-weight: bold;
+}
+
+.interim-text {
+    background: #f0f8ff;
+    border-left: 3px solid #667eea;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+    font-style: italic;
+    min-height: 20px;
+    display: none;
+}
+
+.interim-text.active {
+    display: block;
+}
+
+.interim-text:empty {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .header h1 {
         font-size: 22px;
@@ -467,5 +551,16 @@ body {
         width: 50px;
         height: 50px;
         font-size: 20px;
+    }
+
+    .mic-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .mic-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

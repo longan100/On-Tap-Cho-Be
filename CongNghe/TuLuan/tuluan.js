@@ -48,6 +48,183 @@ let results = {
 
 let isSubmitted = false;
 
+// ===== SPEECH-TO-TEXT FUNCTIONALITY =====
+let recognition = null;
+let isRecording = false;
+let currentQuestionId = null;
+
+// Khởi tạo Speech Recognition
+function initSpeechRecognition() {
+    // Kiểm tra trình duyệt có hỗ trợ không
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        console.error('Trình duyệt không hỗ trợ Speech Recognition');
+        alert('⚠️ Trình duyệt của bạn không hỗ trợ tính năng nhận diện giọng nói. Vui lòng sử dụng Chrome hoặc Edge.');
+        return null;
+    }
+    
+    recognition = new SpeechRecognition();
+    recognition.lang = 'vi-VN';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    
+    // Xử lý kết quả nhận diện
+    recognition.onresult = (event) => {
+        if (!currentQuestionId) return;
+        
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+        
+        // Hiển thị interim transcript
+        const interimElement = document.getElementById(`interim-${currentQuestionId}`);
+        if (interimTranscript) {
+            interimElement.textContent = '🎤 Đang nghe: ' + interimTranscript;
+            interimElement.classList.add('active');
+        } else {
+            interimElement.textContent = '';
+            interimElement.classList.remove('active');
+        }
+        
+        // Append final transcript vào textarea
+        if (finalTranscript) {
+            const textarea = document.getElementById(`answer-input-${currentQuestionId}`);
+            const currentValue = textarea.value;
+            
+            // Thêm khoảng trắng nếu cần
+            const separator = currentValue && !currentValue.endsWith(' ') ? ' ' : '';
+            textarea.value = currentValue + separator + finalTranscript.trim();
+            
+            // Trigger input event để cập nhật sidebar
+            textarea.dispatchEvent(new Event('input'));
+            
+            // Xóa interim text sau khi đã ghi final
+            interimElement.textContent = '';
+        }
+    };
+    
+    // Xử lý khi recognition kết thúc (QUAN TRỌNG - chống tự ngắt)
+    recognition.onend = () => {
+        console.log('Recognition ended, isRecording:', isRecording);
+        
+        // Nếu vẫn đang trong trạng thái recording, khởi động lại
+        if (isRecording && currentQuestionId) {
+            try {
+                recognition.start();
+                console.log('Recognition restarted');
+            } catch (error) {
+                console.error('Error restarting recognition:', error);
+            }
+        }
+    };
+    
+    // Xử lý lỗi
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        
+        // Bỏ qua lỗi 'no-speech' (im lặng bình thường)
+        if (event.error === 'no-speech') {
+            console.log('No speech detected, continuing...');
+            return;
+        }
+        
+        // Các lỗi khác: dừng recording
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            alert('⚠️ Vui lòng cấp quyền sử dụng microphone cho trình duyệt.');
+            stopRecording();
+        } else if (event.error !== 'aborted') {
+            console.error('Recognition error:', event.error);
+            // Không dừng recording cho các lỗi tạm thời khác
+        }
+    };
+    
+    // Xử lý khi bắt đầu
+    recognition.onstart = () => {
+        console.log('Recognition started');
+    };
+    
+    return recognition;
+}
+
+// Hàm toggle mic
+function toggleMic(questionId) {
+    // Khởi tạo recognition nếu chưa có
+    if (!recognition) {
+        recognition = initSpeechRecognition();
+        if (!recognition) return;
+    }
+    
+    const micBtn = document.getElementById(`mic-btn-${questionId}`);
+    const micStatus = document.getElementById(`mic-status-${questionId}`);
+    const micText = micBtn.querySelector('.mic-text');
+    
+    if (!isRecording) {
+        // Bắt đầu ghi âm
+        try {
+            currentQuestionId = questionId;
+            isRecording = true;
+            recognition.start();
+            
+            // Cập nhật UI
+            micBtn.classList.add('recording');
+            micText.textContent = 'Dừng lại';
+            micStatus.textContent = 'Đang nghe...';
+            micStatus.classList.add('listening');
+            
+            console.log('Started recording for question', questionId);
+        } catch (error) {
+            console.error('Error starting recognition:', error);
+            alert('⚠️ Không thể khởi động microphone. Vui lòng thử lại.');
+            isRecording = false;
+            currentQuestionId = null;
+        }
+    } else {
+        // Dừng ghi âm
+        stopRecording();
+    }
+}
+
+// Hàm dừng recording
+function stopRecording() {
+    if (recognition && isRecording) {
+        isRecording = false;
+        recognition.stop();
+        
+        if (currentQuestionId) {
+            const micBtn = document.getElementById(`mic-btn-${currentQuestionId}`);
+            const micStatus = document.getElementById(`mic-status-${currentQuestionId}`);
+            const micText = micBtn.querySelector('.mic-text');
+            const interimElement = document.getElementById(`interim-${currentQuestionId}`);
+            
+            // Cập nhật UI
+            micBtn.classList.remove('recording');
+            micText.textContent = 'Bắt đầu nói';
+            micStatus.textContent = 'Sẵn sàng';
+            micStatus.classList.remove('listening');
+            
+            // Xóa interim text
+            interimElement.textContent = '';
+            interimElement.classList.remove('active');
+            
+            console.log('Stopped recording for question', currentQuestionId);
+        }
+        
+        currentQuestionId = null;
+    }
+}
+
+// ===== END SPEECH-TO-TEXT FUNCTIONALITY =====
+
 // Khởi tạo sidebar
 function initSidebar() {
     updateSidebarPreview();
