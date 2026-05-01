@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tự Luận Công Nghệ Lớp 3</title>
+    <link rel="stylesheet" href="tuluan.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 TỰ LUẬN CÔNG NGHỆ LỚP 3</h1>
+            <p>Đề cương ôn tập cuối học kỳ II</p>
+        </div>
+
+        <div class="content">
+            <!-- Câu 1 -->
+            <div class="question-card">
+                <span class="question-number">Câu 1</span>
+                <div class="question-text">Em hãy kể tên các bước để làm mô hình biển báo giao thông.</div>
+                <textarea class="answer-area" id="answer-input-1" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-1"></div>
+            </div>
+
+            <!-- Câu 2 -->
+            <div class="question-card">
+                <span class="question-number">Câu 2</span>
+                <div class="question-text">Khi lắp ráp mô hình biển báo giao thông đường bộ, em cần làm thế nào?</div>
+                <textarea class="answer-area" id="answer-input-2" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-2"></div>
+            </div>
+
+            <!-- Câu 3 -->
+            <div class="question-card">
+                <span class="question-number">Câu 3</span>
+                <div class="question-text">Em hãy mô tả cách thực hiện làm mô hình máy bay theo thứ tự các bước?</div>
+                <textarea class="answer-area" id="answer-input-3" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-3"></div>
+            </div>
+
+            <!-- Câu 4 -->
+            <div class="question-card">
+                <span class="question-number">Câu 4</span>
+                <div class="question-text">Em hãy kể tên các bước chính để làm đồ dùng học tập?</div>
+                <textarea class="answer-area" id="answer-input-4" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-4"></div>
+            </div>
+
+            <!-- Câu 5 -->
+            <div class="question-card">
+                <span class="question-number">Câu 5</span>
+                <div class="question-text">Một số việc học sinh có thể làm khi tham gia giao thông là:</div>
+                <textarea class="answer-area" id="answer-input-5" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-5"></div>
+            </div>
+
+            <!-- Câu 6 -->
+            <div class="question-card">
+                <span class="question-number">Câu 6</span>
+                <div class="question-text">Em hãy nêu các bước thực hiện làm thước kẻ bằng giấy?</div>
+                <textarea class="answer-area" id="answer-input-6" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-6"></div>
+            </div>
+
+            <!-- Câu 7 -->
+            <div class="question-card">
+                <span class="question-number">Câu 7</span>
+                <div class="question-text">Em hãy nêu các bước thực hiện làm biển báo giao thông cấm xe đi ngược chiều?</div>
+                <textarea class="answer-area" id="answer-input-7" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-7"></div>
+            </div>
+
+            <!-- Câu 8 -->
+            <div class="question-card">
+                <span class="question-number">Câu 8</span>
+                <div class="question-text">Biển báo giao thông là gì?</div>
+                <textarea class="answer-area" id="answer-input-8" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <div class="result-display" id="result-8"></div>
+            </div>
+
+            <!-- Submit All Button -->
+            <button class="submit-all-btn" onclick="submitAll()">Nộp bài và xem điểm</button>
+
+            <!-- Score Display -->
+            <div class="score-display" id="score-display">
+                <h3>🎯 Kết quả của em</h3>
+                <p id="score-text"></p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="../quiz.html" class="nav-btn">← Về trang trắc nghiệm</a>
+                <a href="../index.html" class="nav-btn secondary">🏠 Trang chủ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+            <h3>📋 Danh sách câu hỏi</h3>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">✅ <span id="answeredCount">0</span></div>
+                <div class="stat-item">⚠️ <span id="unansweredCount">8</span></div>
+            </div>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <!-- Danh sách câu hỏi sẽ được tạo bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+        📊
+    </button>
+
+    <script src="tuluan.js"></script>
+</body>
+</html>
