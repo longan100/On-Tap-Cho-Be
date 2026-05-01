@@ -52,6 +52,7 @@ let isSubmitted = false;
 let recognition = null;
 let isRecording = false;
 let currentQuestionId = null;
+let lastProcessedIndex = 0; // Track vị trí đã xử lý để tránh duplicate
 
 // Khởi tạo Speech Recognition
 function initSpeechRecognition() {
@@ -76,11 +77,16 @@ function initSpeechRecognition() {
         let interimTranscript = '';
         let finalTranscript = '';
         
+        // CHỈ xử lý từ resultIndex trở đi (tránh duplicate)
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             
             if (event.results[i].isFinal) {
-                finalTranscript += transcript + ' ';
+                // Chỉ thêm final transcript nếu chưa xử lý index này
+                if (i >= lastProcessedIndex) {
+                    finalTranscript += transcript + ' ';
+                    lastProcessedIndex = i + 1; // Cập nhật vị trí đã xử lý
+                }
             } else {
                 interimTranscript += transcript;
             }
@@ -96,8 +102,8 @@ function initSpeechRecognition() {
             interimElement.classList.remove('active');
         }
         
-        // Append final transcript vào textarea
-        if (finalTranscript) {
+        // Append final transcript vào textarea (CHỈ KHI CÓ TEXT MỚI)
+        if (finalTranscript.trim()) {
             const textarea = document.getElementById(`answer-input-${currentQuestionId}`);
             const currentValue = textarea.value;
             
@@ -116,6 +122,9 @@ function initSpeechRecognition() {
     // Xử lý khi recognition kết thúc (QUAN TRỌNG - chống tự ngắt)
     recognition.onend = () => {
         console.log('Recognition ended, isRecording:', isRecording);
+        
+        // Reset lastProcessedIndex khi restart
+        lastProcessedIndex = 0;
         
         // Nếu vẫn đang trong trạng thái recording, khởi động lại
         if (isRecording && currentQuestionId) {
@@ -173,6 +182,7 @@ function toggleMic(questionId) {
         try {
             currentQuestionId = questionId;
             isRecording = true;
+            lastProcessedIndex = 0; // Reset counter khi bắt đầu mới
             recognition.start();
             
             // Cập nhật UI
@@ -199,6 +209,9 @@ function stopRecording() {
     if (recognition && isRecording) {
         isRecording = false;
         recognition.stop();
+        
+        // Reset counter
+        lastProcessedIndex = 0;
         
         if (currentQuestionId) {
             const micBtn = document.getElementById(`mic-btn-${currentQuestionId}`);
