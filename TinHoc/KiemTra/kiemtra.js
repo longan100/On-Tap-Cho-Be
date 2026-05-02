@@ -5,10 +5,10 @@ const tracnghiemData = [
         question: "Biểu tượng của phần mềm trình chiếu là?",
         hasImage: true,
         options: [
-            { text: "A", image: "images/hinh1.png" },
-            { text: "B", image: "images/hinh2.png" },
-            { text: "C", image: "images/hinh3.png" },
-            { text: "D", image: "images/hinh4.png" }
+            { text: "", image: "../images/hinh1.png" },
+            { text: "", image: "../images/hinh2.png" },
+            { text: "", image: "../images/hinh3.png" },
+            { text: "", image: "../images/hinh4.png" }
         ],
         answer: 1
     },
@@ -17,9 +17,9 @@ const tracnghiemData = [
         question: "Nút lệnh nào sau đây dùng để chọn cỡ chữ?",
         hasImage: true,
         options: [
-            { text: "A", image: "images/hinh5.png" },
-            { text: "B", image: "images/hinh6.png" },
-            { text: "C", image: "images/hinh7.png" }
+            { text: "", image: "../images/hinh5.png" },
+            { text: "", image: "../images/hinh6.png" },
+            { text: "", image: "../images/hinh7.png" }
         ],
         answer: 2
     },
@@ -52,9 +52,9 @@ const tracnghiemData = [
         question: "Để khởi động phần mềm Word em thực hiện thao tác nào?",
         hasImage: true,
         options: [
-            { text: "Nháy đúp chuột vào biểu tượng", image: "images/hinh8.png" },
-            { text: "Nháy đúp chuột vào biểu tượng", image: "images/hinh9.png" },
-            { text: "Nháy đúp chuột vào biểu tượng", image: "images/hinh10.png" }
+            { text: "Nháy đúp chuột vào biểu tượng", image: "../images/hinh8.png" },
+            { text: "Nháy đúp chuột vào biểu tượng", image: "../images/hinh9.png" },
+            { text: "Nháy đúp chuột vào biểu tượng", image: "../images/hinh10.png" }
         ],
         answer: 0
     },
@@ -311,7 +311,7 @@ function renderTracnghiem() {
             html += `<span class="option-text">${letter}. `;
             
             if (q.hasImage && option.image) {
-                html += `<img src="${option.image}" class="question-image" alt="${option.text}">`;
+                html += option.text + `<img src="${option.image}" class="question-image" alt="${option.text}">`;
             } else {
                 html += option.text;
             }
