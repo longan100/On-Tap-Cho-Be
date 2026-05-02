@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Công Nghệ Lớp 3</title>
+    <link rel="stylesheet" href="tracnghiem.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 TRẮC NGHIỆM CÔNG NGHỆ LỚP 3</h1>
+            <p>Đề cương ôn tập cuối học kỳ II</p>
+        </div>
+
+        <div class="quiz-content">
+            <form id="quizForm">
+                <!-- Câu hỏi sẽ được tạo động bằng JavaScript -->
+            </form>
+            
+            <button type="submit" class="submit-btn" onclick="document.getElementById('quizForm').dispatchEvent(new Event('submit'))">Nộp bài</button>
+
+            <div class="result-box" id="resultBox">
+                <h2>🎉 KẾT QUẢ BÀI LÀM</h2>
+                <div class="score" id="scoreDisplay">0/26</div>
+                <div class="result-message" id="resultMessage"></div>
+                <button class="reset-btn" onclick="resetQuiz()">Làm lại</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+            <h3>📋 Danh sách câu hỏi</h3>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">✅ <span id="correctCount">0</span></div>
+                <div class="stat-item">❌ <span id="incorrectCount">0</span></div>
+                <div class="stat-item">⚠️ <span id="unansweredCount">0</span></div>
+            </div>
+            <div class="sidebar-filters">
+                <button class="filter-btn active" onclick="filterQuestions('all')">Tất cả</button>
+                <button class="filter-btn" onclick="filterQuestions('incorrect')">Sai</button>
+                <button class="filter-btn" onclick="filterQuestions('unanswered')">Chưa trả lời</button>
+            </div>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <!-- Danh sách câu hỏi sẽ được tạo bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+        📊
+    </button>
+
+    <script src="tracnghiem.js"></script>
+</body>
+</html>

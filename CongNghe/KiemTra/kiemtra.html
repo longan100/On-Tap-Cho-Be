@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Tổng Hợp - Công Nghệ Lớp 3</title>
+    <link rel="stylesheet" href="kiemtra.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 KIỂM TRA TỔNG HỢP CÔNG NGHỆ LỚP 3</h1>
+            <p>Trắc nghiệm (xáo trộn) + Tự luận</p>
+        </div>
+
+        <div class="content">
+            <!-- Phần Trắc Nghiệm -->
+            <div class="section-title">📝 PHẦN I: TRẮC NGHIỆM (26 câu)</div>
+            <form id="tracnghiemForm">
+                <!-- Câu hỏi trắc nghiệm sẽ được tạo động -->
+            </form>
+
+            <!-- Phần Tự Luận -->
+            <div class="section-title">✍️ PHẦN II: TỰ LUẬN (8 câu)</div>
+            <div id="tuluanForm">
+                <!-- Câu hỏi tự luận -->
+            </div>
+
+            <!-- Submit Button -->
+            <button class="submit-btn" id="submitBtn">Nộp bài và xem điểm</button>
+
+            <!-- Score Display -->
+            <div class="score-display" id="score-display">
+                <h3>🎉 KẾT QUẢ BÀI LÀM</h3>
+                <div class="score-detail" id="tracnghiem-score"></div>
+                <div class="score-detail" id="tuluan-score"></div>
+                <div class="total-score" id="total-score"></div>
+                <p id="result-message"></p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="../index.html" class="nav-btn">🏠 Về trang chủ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+            <h3>📋 Danh sách câu hỏi</h3>
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-item">✅ <span id="answeredCount">0</span></div>
+                <div class="stat-item">⚠️ <span id="unansweredCount">34</span></div>
+            </div>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <!-- Danh sách câu hỏi sẽ được tạo bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+        📊
+    </button>
+
+    <script src="kiemtra.js"></script>
+</body>
+</html>
