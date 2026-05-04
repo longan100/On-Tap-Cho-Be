@@ -671,6 +671,9 @@ document.getElementById('submitBtn').addEventListener('click', function() {
     // Cập nhật sidebar
     updateSidebarPreview();
     
+    // Lưu lịch sử
+    saveToHistory(tnScore, tlScore, maxScore);
+    
     // Cuộn xuống kết quả
     setTimeout(() => {
         document.getElementById('score-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -885,5 +888,83 @@ function scrollToTuluan(index) {
     // Đóng sidebar trên mobile
     if (window.innerWidth <= 768) {
         toggleSidebar();
+    }
+}
+
+// Hàm lưu lịch sử
+function saveToHistory(tnScore, tlScore, maxScore) {
+    const totalScore = tnScore + tlScore;
+    const correctCount = Math.round(totalScore);
+    const incorrectCount = maxScore - correctCount;
+
+    // Chuẩn bị dữ liệu chi tiết câu hỏi
+    const questionsDetail = [];
+
+    // Thêm câu trắc nghiệm
+    shuffledTracnghiem.forEach((q, index) => {
+        const resultDiv = document.getElementById(`tn-result-${index}`);
+        const isCorrect = resultDiv && resultDiv.classList.contains('correct');
+
+        questionsDetail.push({
+            question: q.question,
+            type: 'tracnghiem',
+            imageUrl: q.hasImage ? q.imageUrl : null,
+            options: q.options.map(opt => opt.text),
+            userAnswer: q.isMultiple ? 
+                Array.from(document.querySelectorAll(`input[name="tn${index}"]:checked`)).map(inp => parseInt(inp.value)) :
+                (document.querySelector(`input[name="tn${index}"]:checked`) ? 
+                    parseInt(document.querySelector(`input[name="tn${index}"]:checked`).value) : null),
+            correctAnswer: q.answer,
+            isCorrect: isCorrect,
+            isPartial: false
+        });
+    });
+
+    // Thêm câu tự luận
+    tuluanData.forEach((q, index) => {
+        const resultDiv = document.getElementById(`tl-result-${index}`);
+        let isCorrect = false;
+        let isPartial = false;
+
+        if (resultDiv) {
+            isCorrect = resultDiv.classList.contains('correct');
+            isPartial = resultDiv.classList.contains('partial');
+        }
+
+        let userAnswer = '';
+        if (q.subQuestions) {
+            userAnswer = q.subQuestions.map(sub => {
+                const ans = document.getElementById(`tl-${index}-${sub.id}`)?.value.trim() || '';
+                return `${sub.text}: ${ans}`;
+            }).join('\n');
+        } else {
+            userAnswer = document.getElementById(`tl-${index}`)?.value.trim() || '';
+        }
+
+        questionsDetail.push({
+            question: q.question,
+            type: 'tuluan',
+            imageUrl: null,
+            options: [],
+            userAnswer: userAnswer,
+            correctAnswer: q.fullAnswer || '',
+            isCorrect: isCorrect,
+            isPartial: isPartial
+        });
+    });
+
+    // Tạo object lịch sử
+    const historyData = {
+        type: 'kiemtra',
+        totalQuestions: maxScore,
+        correctCount: correctCount,
+        incorrectCount: incorrectCount,
+        percentage: Math.round((totalScore / maxScore) * 100),
+        questions: questionsDetail
+    };
+
+    // Lưu vào localStorage thông qua HistoryManager
+    if (typeof HistoryManager !== 'undefined') {
+        HistoryManager.add(historyData);
     }
 }

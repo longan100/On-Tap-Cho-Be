@@ -480,6 +480,9 @@ form.addEventListener('submit', function(e) {
     // Cập nhật sidebar
     updateSidebar();
     
+    // Lưu lịch sử vào localStorage
+    saveToHistory(score, totalQuestions);
+    
     // Cuộn xuống kết quả
     setTimeout(() => {
         resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -670,6 +673,36 @@ function scrollToQuestion(index) {
     // Đóng sidebar trên mobile
     if (window.innerWidth <= 768) {
         toggleSidebar();
+    }
+}
+
+// Hàm lưu lịch sử
+function saveToHistory(correctCount, totalQuestions) {
+    // Chuẩn bị dữ liệu chi tiết câu hỏi
+    const questionsDetail = shuffledQuestions.map((q, index) => ({
+        question: q.question,
+        type: 'tracnghiem',
+        imageUrl: q.hasImage ? q.imageUrl : null,
+        options: q.options.map(opt => opt.text),
+        userAnswer: q.userAnswer,
+        correctAnswer: q.answer,
+        isCorrect: q.isCorrect,
+        isPartial: false
+    }));
+
+    // Tạo object lịch sử
+    const historyData = {
+        type: 'tracnghiem',
+        totalQuestions: totalQuestions,
+        correctCount: correctCount,
+        incorrectCount: totalQuestions - correctCount,
+        percentage: Math.round((correctCount / totalQuestions) * 100),
+        questions: questionsDetail
+    };
+
+    // Lưu vào localStorage thông qua HistoryManager
+    if (typeof HistoryManager !== 'undefined') {
+        HistoryManager.add(historyData);
     }
 }
 

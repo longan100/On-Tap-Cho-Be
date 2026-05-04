@@ -272,10 +272,53 @@ function submitAll() {
     // Cập nhật sidebar
     updateSidebarPreview();
     
+    // Lưu lịch sử
+    saveToHistory(totalScore, 8);
+    
     // Scroll đến phần hiển thị điểm
     setTimeout(() => {
         scoreDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
+}
+
+// Hàm lưu lịch sử
+function saveToHistory(totalScore, totalQuestions) {
+    // Tính số câu đúng (làm tròn)
+    const correctCount = Math.round(totalScore);
+    const incorrectCount = totalQuestions - correctCount;
+
+    // Chuẩn bị dữ liệu chi tiết câu hỏi
+    const questionsDetail = [];
+    for (let i = 1; i <= 8; i++) {
+        const userAnswer = document.getElementById(`answer-input-${i}`).value.trim();
+        questionsDetail.push({
+            question: Object.keys(correctAnswers)[i - 1] ? 
+                document.querySelectorAll('.question-card')[i - 1]?.querySelector('.question-text')?.textContent || `Câu ${i}` : 
+                `Câu ${i}`,
+            type: 'tuluan',
+            imageUrl: null,
+            options: [],
+            userAnswer: userAnswer,
+            correctAnswer: correctAnswers[i]?.fullAnswer || '',
+            isCorrect: results[i] === 1,
+            isPartial: results[i] === 0.5
+        });
+    }
+
+    // Tạo object lịch sử
+    const historyData = {
+        type: 'tuluan',
+        totalQuestions: totalQuestions,
+        correctCount: correctCount,
+        incorrectCount: incorrectCount,
+        percentage: Math.round((totalScore / totalQuestions) * 100),
+        questions: questionsDetail
+    };
+
+    // Lưu vào localStorage thông qua HistoryManager
+    if (typeof HistoryManager !== 'undefined') {
+        HistoryManager.add(historyData);
+    }
 }
 
 // Khởi tạo khi trang load

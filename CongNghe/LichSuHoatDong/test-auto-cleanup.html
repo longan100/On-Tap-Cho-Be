@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tự Động Xóa Lịch Sử Cũ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-success { background: #4caf50; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+        pre {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 400px;
+            font-size: 12px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+        }
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #f44336, #e91e63);
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Tự Động Xóa Lịch Sử Cũ</h1>
+
+    <div class="info-box">
+        <strong>ℹ️ Hướng dẫn test:</strong><br>
+        1. Thêm nhiều lịch sử để đạt giới hạn (100 lịch sử hoặc 4MB)<br>
+        2. Quan sát hệ thống tự động xóa lịch sử cũ nhất<br>
+        3. Kiểm tra console để xem log tự động xóa
+    </div>
+
+    <div class="section">
+        <h2>📊 Thông Tin Bộ Nhớ</h2>
+        <div id="storageInfo">
+            <p><strong>Số lượng:</strong> <span id="count">0</span> / <span id="maxCount">100</span> lịch sử</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="countProgress" style="width: 0%">0%</div>
+            </div>
+            
+            <p><strong>Dung lượng:</strong> <span id="size">0</span> / <span id="maxSize">4</span> MB</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="sizeProgress" style="width: 0%">0%</div>
+            </div>
+        </div>
+        <div id="statusBox" class="info-box" style="margin-top: 15px;">
+            <strong>Trạng thái:</strong> <span id="status">Đang tải...</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎯 Thao Tác Test</h2>
+        <button class="btn-primary" onclick="add1History()">Thêm 1 Lịch Sử</button>
+        <button class="btn-primary" onclick="add10History()">Thêm 10 Lịch Sử</button>
+        <button class="btn-warning" onclick="add50History()">Thêm 50 Lịch Sử</button>
+        <button class="btn-warning" onclick="fillToLimit()">Đẩy Đến Giới Hạn</button>
+        <button class="btn-danger" onclick="clearAll()">Xóa Tất Cả</button>
+    </div>
+
+    <div class="section">
+        <h2>📋 Log Hoạt Động</h2>
+        <button class="btn-primary" onclick="refreshLog()">Làm Mới</button>
+        <button class="btn-danger" onclick="clearLog()">Xóa Log</button>
+        <pre id="log">Chưa có hoạt động...</pre>
+    </div>
+
+    <div class="section">
+        <h2>🔍 Danh Sách Lịch Sử</h2>
+        <button class="btn-primary" onclick="viewHistory()">Xem Danh Sách</button>
+        <button class="btn-success" onclick="location.href='./history.html'">Mở Trang Lịch Sử</button>
+        <pre id="historyList">Nhấn "Xem Danh Sách" để hiển thị...</pre>
+    </div>
+
+    <script src="./history-manager.js"></script>
+    <script>
+        let logMessages = [];
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logMessages.push(`[${timestamp}] ${message}`);
+            updateLog();
+        }
+
+        function updateLog() {
+            document.getElementById('log').textContent = logMessages.join('\n');
+        }
+
+        function clearLog() {
+            logMessages = [];
+            updateLog();
+        }
+
+        function refreshLog() {
+            updateStorageInfo();
+            log('🔄 Đã làm mới thông tin');
+        }
+
+        function updateStorageInfo() {
+            const info = HistoryManager.getStorageInfo();
+            
+            // Cập nhật số lượng
+            document.getElementById('count').textContent = info.count;
+            document.getElementById('maxCount').textContent = info.maxCount;
+            
+            const countPercent = (info.count / info.maxCount * 100).toFixed(1);
+            const countProgress = document.getElementById('countProgress');
+            countProgress.style.width = countPercent + '%';
+            countProgress.textContent = countPercent + '%';
+            
+            if (countPercent > 80) {
+                countProgress.className = 'progress-fill danger';
+            } else if (countPercent > 60) {
+                countProgress.className = 'progress-fill warning';
+            } else {
+                countProgress.className = 'progress-fill';
+            }
+            
+            // Cập nhật dung lượng
+            document.getElementById('size').textContent = info.sizeInMB;
+            document.getElementById('maxSize').textContent = info.maxSizeInMB;
+            
+            const sizePercent = parseFloat(info.percentUsed);
+            const sizeProgress = document.getElementById('sizeProgress');
+            sizeProgress.style.width = sizePercent + '%';
+            sizeProgress.textContent = sizePercent + '%';
+            
+            if (sizePercent > 80) {
+                sizeProgress.className = 'progress-fill danger';
+            } else if (sizePercent > 60) {
+                sizeProgress.className = 'progress-fill warning';
+            } else {
+                sizeProgress.className = 'progress-fill';
+            }
+            
+            // Cập nhật trạng thái
+            const statusBox = document.getElementById('statusBox');
+            const statusText = document.getElementById('status');
+            
+            if (info.isFull || sizePercent > 90 || countPercent > 90) {
+                statusBox.className = 'warning-box';
+                statusText.textContent = '🔴 Gần đầy! Hệ thống sẽ tự động xóa lịch sử cũ khi thêm mới.';
+            } else if (sizePercent > 70 || countPercent > 70) {
+                statusBox.className = 'warning-box';
+                statusText.textContent = '🟡 Cảnh báo: Bộ nhớ đang dần đầy.';
+            } else {
+                statusBox.className = 'success-box';
+                statusText.textContent = '🟢 Bình thường: Còn đủ bộ nhớ.';
+            }
+        }
+
+        function createSampleHistory() {
+            const types = ['tracnghiem', 'tuluan', 'kiemtra'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let totalQuestions, correctCount;
+            if (type === 'tracnghiem') {
+                totalQuestions = 26;
+                correctCount = Math.floor(Math.random() * 10) + 16;
+            } else if (type === 'tuluan') {
+                totalQuestions = 8;
+                correctCount = Math.floor(Math.random() * 3) + 5;
+            } else {
+                totalQuestions = 34;
+                correctCount = Math.floor(Math.random() * 10) + 24;
+            }
+            
+            return {
+                type: type,
+                totalQuestions: totalQuestions,
+                correctCount: correctCount,
+                incorrectCount: totalQuestions - correctCount,
+                percentage: Math.round((correctCount / totalQuestions) * 100),
+                questions: Array(totalQuestions).fill(null).map((_, i) => ({
+                    question: `Câu hỏi số ${i + 1}`,
+                    type: i < 26 ? 'tracnghiem' : 'tuluan',
+                    imageUrl: null,
+                    options: i < 26 ? ['A', 'B', 'C', 'D'] : [],
+                    userAnswer: i < 26 ? Math.floor(Math.random() * 4) : 'Câu trả lời mẫu',
+                    correctAnswer: i < 26 ? Math.floor(Math.random() * 4) : 'Đáp án mẫu',
+                    isCorrect: Math.random() > 0.3,
+                    isPartial: false
+                }))
+            };
+        }
+
+        function add1History() {
+            const beforeCount = HistoryManager.getAll().length;
+            HistoryManager.add(createSampleHistory());
+            const afterCount = HistoryManager.getAll().length;
+            
+            if (afterCount === beforeCount) {
+                log('⚠️ Đã thêm 1 lịch sử và tự động xóa 1 lịch sử cũ (đạt giới hạn)');
+            } else {
+                log(`✅ Đã thêm 1 lịch sử (Tổng: ${afterCount})`);
+            }
+            updateStorageInfo();
+        }
+
+        function add10History() {
+            const beforeCount = HistoryManager.getAll().length;
+            for (let i = 0; i < 10; i++) {
+                HistoryManager.add(createSampleHistory());
+            }
+            const afterCount = HistoryManager.getAll().length;
+            const added = afterCount - beforeCount;
+            
+            log(`✅ Đã thêm 10 lịch sử (Thực tế thêm: ${added}, Tổng: ${afterCount})`);
+            if (added < 10) {
+                log(`🗑️ Đã tự động xóa ${10 - added} lịch sử cũ`);
+            }
+            updateStorageInfo();
+        }
+
+        function add50History() {
+            const beforeCount = HistoryManager.getAll().length;
+            for (let i = 0; i < 50; i++) {
+                HistoryManager.add(createSampleHistory());
+            }
+            const afterCount = HistoryManager.getAll().length;
+            const added = afterCount - beforeCount;
+            
+            log(`✅ Đã thêm 50 lịch sử (Thực tế thêm: ${added}, Tổng: ${afterCount})`);
+            if (added < 50) {
+                log(`🗑️ Đã tự động xóa ${50 - added} lịch sử cũ`);
+            }
+            updateStorageInfo();
+        }
+
+        function fillToLimit() {
+            const beforeCount = HistoryManager.getAll().length;
+            const toAdd = 120; // Thêm nhiều hơn giới hạn
+            
+            for (let i = 0; i < toAdd; i++) {
+                HistoryManager.add(createSampleHistory());
+            }
+            
+            const afterCount = HistoryManager.getAll().length;
+            const added = afterCount - beforeCount;
+            
+            log(`✅ Đã thêm ${toAdd} lịch sử (Thực tế thêm: ${added}, Tổng: ${afterCount})`);
+            log(`🗑️ Đã tự động xóa ${toAdd - added} lịch sử cũ để giữ trong giới hạn`);
+            log(`📊 Hệ thống đã tự động dọn dẹp và giữ ${afterCount} lịch sử mới nhất`);
+            updateStorageInfo();
+        }
+
+        function clearAll() {
+            if (confirm('⚠️ Xóa tất cả lịch sử test?')) {
+                HistoryManager.deleteAll();
+                log('🗑️ Đã xóa tất cả lịch sử');
+                updateStorageInfo();
+            }
+        }
+
+        function viewHistory() {
+            const history = HistoryManager.getAll();
+            const sorted = HistoryManager.sortByDate(history, false);
+            
+            let text = `📋 DANH SÁCH LỊCH SỬ (${history.length} lịch sử)\n\n`;
+            
+            sorted.forEach((item, index) => {
+                const date = HistoryManager.formatDateTime(item.timestamp);
+                const type = HistoryManager.getTypeName(item.type);
+                text += `${index + 1}. [${date}] ${type} - ${item.percentage}%\n`;
+            });
+            
+            document.getElementById('historyList').textContent = text;
+        }
+
+        // Khởi tạo
+        updateStorageInfo();
+        log('🚀 Hệ thống đã sẵn sàng');
+        
+        // Tự động cập nhật mỗi 2 giây
+        setInterval(updateStorageInfo, 2000);
+    </script>
+</body>
+</html>
