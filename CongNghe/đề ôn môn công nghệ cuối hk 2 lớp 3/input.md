@@ -214,11 +214,11 @@ C. 4 hình chữ nhật có kích thước 3cm x 21cm.
 
 Câu 23: (1 điểm) Biển báo cấm xe đi ngược chiều gồm có mấy bộ phận. (M3)
 
-A. 3 bộ phận.
+*A. 3 bộ phận.
 
 B. 5 bộ phận.
 
-*C. 4 bộ phận.
+C. 4 bộ phận.
 
 Câu 24: (1 điểm) quan sát những hình sau đã cho, đâu là biển báo hướng
 dẫn người đi bộ. (M1)

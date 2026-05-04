@@ -257,7 +257,7 @@ const questionsData = [
             { text: "5 bộ phận" },
             { text: "4 bộ phận" }
         ],
-        answer: 2
+        answer: 0
     },
     {
         id: 24,
@@ -265,10 +265,10 @@ const questionsData = [
         hasImage: true,
         imageUrl: "../đề ôn môn công nghệ cuối hk 2 lớp 3/image5.png",
         options: [
-            { text: "Hình a" },
-            { text: "Hình b" },
-            { text: "Hình c" },
-            { text: "Hình d" }
+            { text: "A" },
+            { text: "B" },
+            { text: "C" },
+            { text: "D" }
         ],
         answer: 1
     },
