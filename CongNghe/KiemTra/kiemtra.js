@@ -361,6 +361,7 @@ function shuffleArray(array) {
 
 // Biến lưu trữ câu hỏi đã xáo trộn
 let shuffledTracnghiem = [];
+let shuffledTuluan = [];
 let tuluanResults = {};
 let isSubmitted = false;
 
@@ -428,12 +429,15 @@ function renderTracnghiem() {
     });
 }
 
-// Khởi tạo tự luận
+// Khởi tạo tự luận (với xáo trộn)
 function initTuluan() {
+    // Xáo trộn câu hỏi tự luận
+    shuffledTuluan = shuffleArray(tuluanData);
+    
     const container = document.getElementById('tuluanForm');
     container.innerHTML = '';
     
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q, index) => {
         const questionCard = document.createElement('div');
         questionCard.className = 'question-card';
         
@@ -547,11 +551,11 @@ function checkTracnghiem() {
     return score;
 }
 
-// Kiểm tra tự luận
+// Kiểm tra tự luận (sử dụng shuffledTuluan)
 function checkTuluan() {
     let totalScore = 0;
     
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q, index) => {
         const resultDiv = document.getElementById(`tl-result-${index}`);
         
         if (q.subQuestions) {
@@ -615,7 +619,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
     }
     
     let hasEmptyTL = false;
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q, index) => {
         if (q.subQuestions) {
             q.subQuestions.forEach(sub => {
                 const answer = document.getElementById(`tl-${index}-${sub.id}`).value.trim();
@@ -778,12 +782,12 @@ function updateSidebarPreview() {
     
     sidebarContent.appendChild(tnSection);
     
-    // Phần tự luận
+    // Phần tự luận (sử dụng shuffledTuluan)
     const tlSection = document.createElement('div');
     tlSection.className = 'sidebar-section';
     tlSection.innerHTML = '<h4>✍️ TỰ LUẬN (8 câu)</h4>';
     
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q, index) => {
         const item = document.createElement('div');
         item.className = 'question-item';
         
@@ -920,8 +924,8 @@ function saveToHistory(tnScore, tlScore, maxScore) {
         });
     });
 
-    // Thêm câu tự luận
-    tuluanData.forEach((q, index) => {
+    // Thêm câu tự luận (sử dụng shuffledTuluan)
+    shuffledTuluan.forEach((q, index) => {
         const resultDiv = document.getElementById(`tl-result-${index}`);
         let isCorrect = false;
         let isPartial = false;

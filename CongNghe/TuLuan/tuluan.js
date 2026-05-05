@@ -1,38 +1,58 @@
-// Đáp án chuẩn cho từng câu hỏi
-const correctAnswers = {
-    1: {
+// Đáp án chuẩn cho từng câu hỏi (dạng mảng để có thể xáo trộn)
+const correctAnswersData = [
+    {
+        id: 1,
+        question: "Em hãy kể tên các bước để làm mô hình biển báo giao thông.",
         keywords: ['tìm hiểu', 'sản phẩm mẫu', 'lựa chọn', 'vật liệu', 'dụng cụ', 'làm đế', 'biển báo', 'cột', 'lắp ráp', 'kiểm tra'],
         fullAnswer: 'Bước 1: Tìm hiểu sản phẩm mẫu. Bước 2: Lựa chọn vật liệu, dụng cụ. Bước 3: Làm đế, làm biển báo và làm cột biển báo. Bước 4: Lắp ráp, kiểm tra mô hình.'
     },
-    2: {
+    {
+        id: 2,
+        question: "Khi lắp ráp mô hình biển báo giao thông đường bộ, em cần làm thế nào?",
         keywords: ['dán', 'mặt sau', 'biển báo', 'thân', 'lắp ráp', 'mấu cắm', 'kiểm tra'],
         fullAnswer: 'Dán mặt sau của biển báo vào thân mô hình. Lắp ráp thân biển báo vào mấu cắm mô hình. Kiểm tra mô hình sau khi lắp ráp xong.'
     },
-    3: {
+    {
+        id: 3,
+        question: "Em hãy mô tả cách thực hiện làm mô hình máy bay theo thứ tự các bước?",
         keywords: ['thiết kế', 'mẫu', 'cắt', 'bộ phận', 'máy bay', 'gắn', 'thân', 'cánh', 'hoàn thành'],
         fullAnswer: 'Bước 1: Thiết kế mẫu. Bước 2: Cắt các bộ phận của máy bay giấy. Bước 3: Gắn thân và sải cánh. Bước 4: Hoàn thành sản phẩm.'
     },
-    4: {
+    {
+        id: 4,
+        question: "Em hãy kể tên các bước chính để làm đồ dùng học tập?",
         keywords: ['tìm hiểu', 'sản phẩm mẫu', 'lựa chọn', 'nguyên vật liệu', 'tiến hành', 'trang trí', 'kiểm tra'],
         fullAnswer: 'Bước 1: Tìm hiểu sản phẩm mẫu. Bước 2: Lựa chọn nguyên vật liệu. Bước 3: Tiến hành làm và trang trí sản phẩm. Bước 4: Kiểm tra sản phẩm sau khi làm.'
     },
-    5: {
+    {
+        id: 5,
+        question: "Một số việc học sinh có thể làm khi tham gia giao thông là:",
         keywords: ['tuân thủ', 'đèn tín hiệu', 'đội', 'mũ bảo hiểm', 'xe máy', 'sang đường', 'vạch kẻ', 'người đi bộ'],
         fullAnswer: 'Tuân thủ đèn tín hiệu giao thông. Đội mũ bảo hiểm khi ngồi trên xe máy. Sang đường đúng chỗ có vạch kẻ đường dành cho người đi bộ.'
     },
-    6: {
+    {
+        id: 6,
+        question: "Em hãy nêu các bước thực hiện làm thước kẻ bằng giấy?",
         keywords: ['tạo hình', 'thước', 'tạo khung', 'chia vạch', 'hoàn thiện'],
         fullAnswer: 'Bước 1: Tạo hình của thước. Bước 2: Tạo khung thước. Bước 3: Chia vạch trên thước. Bước 4: Hoàn thiện sản phẩm.'
     },
-    7: {
+    {
+        id: 7,
+        question: "Em hãy nêu các bước thực hiện làm biển báo giao thông cấm xe đi ngược chiều?",
         keywords: ['làm biển báo', 'làm cột', 'làm đế', 'hoàn thiện'],
         fullAnswer: 'Bước 1: Làm biển báo. Bước 2: Làm cột biển báo. Bước 3: Làm đế biển báo. Bước 4: Hoàn thiện sản phẩm.'
     },
-    8: {
+    {
+        id: 8,
+        question: "Biển báo giao thông là gì?",
         keywords: ['sáng chế', 'loài người', 'rô ma', 'hai nghìn năm', 'cột trụ', 'khoảng cách', 'nghị viện', 'phổ biến'],
         fullAnswer: 'Biển báo giao thông là một sáng chế vĩ đại của loài người. Những tấm biển báo giao thông đường bộ đầu tiên xuất hiện ở Rô-ma cách đây hơn hai nghìn năm. Đó là các biển báo dạng chữ viết ghi trên các cột trụ, ghi lại khoảng cách từ điểm đặt cột đến Nghị viện Rô-ma. Sau đó, hệ thống biển báo giao thông kiểu này đã trở nên phổ biến ở nhiều quốc gia.'
     }
-};
+];
+
+// Biến lưu trữ câu hỏi đã xáo trộn và mapping
+let shuffledQuestions = [];
+let correctAnswers = {};
 
 // Lưu trữ kết quả kiểm tra
 let results = {
@@ -47,6 +67,59 @@ let results = {
 };
 
 let isSubmitted = false;
+
+// Hàm xáo trộn mảng
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Khởi tạo câu hỏi (xáo trộn)
+function initQuestions() {
+    // Xáo trộn câu hỏi
+    shuffledQuestions = shuffleArray(correctAnswersData);
+    
+    // Tạo mapping mới cho correctAnswers
+    correctAnswers = {};
+    shuffledQuestions.forEach((q, index) => {
+        correctAnswers[index + 1] = {
+            keywords: q.keywords,
+            fullAnswer: q.fullAnswer
+        };
+    });
+    
+    // Render lại HTML với câu hỏi đã xáo trộn
+    renderQuestions();
+}
+
+// Render câu hỏi đã xáo trộn
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+    
+    // Thêm câu hỏi mới
+    shuffledQuestions.forEach((q, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'question-card';
+        questionCard.innerHTML = `
+            <span class="question-number">Câu ${index + 1}</span>
+            <div class="question-text">${q.question}</div>
+            <textarea class="answer-area" id="answer-input-${index + 1}" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+            <div class="result-display" id="result-${index + 1}"></div>
+        `;
+        container.appendChild(questionCard);
+    });
+    
+    // Reset results
+    results = {};
+    for (let i = 1; i <= 8; i++) {
+        results[i] = null;
+    }
+}
 
 // Khởi tạo sidebar
 function initSidebar() {
@@ -322,4 +395,7 @@ function saveToHistory(totalScore, totalQuestions) {
 }
 
 // Khởi tạo khi trang load
-window.onload = initSidebar;
+window.onload = function() {
+    initQuestions();
+    initSidebar();
+};
