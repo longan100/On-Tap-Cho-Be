@@ -42,6 +42,117 @@ let results = {
 
 let isSubmitted = false;
 
+// Biến lưu trữ câu hỏi đã xáo trộn
+let shuffledQuestions = [];
+
+// Hàm xáo trộn mảng
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Hàm khởi tạo và đảo câu hỏi
+function initQuestions() {
+    // Tạo mảng câu hỏi với ID gốc
+    const questionList = [
+        { originalId: 1, data: correctAnswers[1] },
+        { originalId: 2, data: correctAnswers[2] },
+        { originalId: 3, data: correctAnswers[3] },
+        { originalId: 4, data: correctAnswers[4] }
+    ];
+    
+    // Xáo trộn câu hỏi
+    shuffledQuestions = shuffleArray(questionList);
+    
+    // Render câu hỏi đã xáo trộn
+    renderQuestions();
+}
+
+// Hàm render câu hỏi
+function renderQuestions() {
+    const container = document.querySelector('.content');
+    
+    // Xóa các câu hỏi cũ (giữ lại header và các phần khác)
+    const oldQuestions = container.querySelectorAll('.question-card');
+    oldQuestions.forEach(q => q.remove());
+    
+    // Tìm vị trí để chèn câu hỏi (sau header)
+    const header = container.querySelector('.header');
+    let insertPosition = header ? header.nextElementSibling : container.firstChild;
+    
+    // Định nghĩa nội dung câu hỏi
+    const questionTexts = {
+        1: 'Em làm thế nào để bảo vệ thông tin cá nhân và gia đình khi giao tiếp qua mạng Internet?',
+        2: 'Như thế nào là thực hiện công việc theo từng bước?',
+        3: 'Chuyển thành dạng "Nếu… thì…"',
+        4: 'Tại sao phải chia một việc thành nhiều việc nhỏ hơn?'
+    };
+    
+    const subQuestions = {
+        a: 'a) Khi em đi học muộn, lớp em sẽ bị trừ điểm thi đua.',
+        b: 'b) Khi đi bộ đi học, em cần đi trên vỉa hè.',
+        c: 'c) Hôm nay trời mưa, Nam không đi đá bóng.',
+        d: 'd) Hôm nay học thể dục, Hoa mặc áo quần thể dục và đeo giày.'
+    };
+    
+    // Tạo các câu hỏi mới theo thứ tự đã xáo trộn
+    shuffledQuestions.forEach((question, displayIndex) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'question-card';
+        questionCard.setAttribute('data-original-id', question.originalId);
+        
+        let html = `
+            <span class="question-number">Câu ${displayIndex + 1}</span>
+            <div class="question-text">${questionTexts[question.originalId]}</div>
+        `;
+        
+        // Nếu là câu 3, thêm các phần con
+        if (question.originalId === 3) {
+            html += `
+                <div class="sub-question">
+                    <label class="sub-question-label">${subQuestions.a}</label>
+                    <textarea class="answer-area" id="answer-input-${question.originalId}a" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+                <div class="sub-question">
+                    <label class="sub-question-label">${subQuestions.b}</label>
+                    <textarea class="answer-area" id="answer-input-${question.originalId}b" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+                <div class="sub-question">
+                    <label class="sub-question-label">${subQuestions.c}</label>
+                    <textarea class="answer-area" id="answer-input-${question.originalId}c" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+                <div class="sub-question">
+                    <label class="sub-question-label">${subQuestions.d}</label>
+                    <textarea class="answer-area" id="answer-input-${question.originalId}d" placeholder="Nhập câu trả lời của em..."></textarea>
+                </div>
+            `;
+        } else {
+            html += `<textarea class="answer-area" id="answer-input-${question.originalId}" placeholder="Nhập câu trả lời của em vào đây..."></textarea>`;
+        }
+        
+        html += `<div class="result-display" id="result-${question.originalId}"></div>`;
+        
+        questionCard.innerHTML = html;
+        
+        // Chèn câu hỏi vào đúng vị trí
+        const submitBtn = container.querySelector('.submit-all-btn');
+        if (submitBtn) {
+            container.insertBefore(questionCard, submitBtn);
+        } else {
+            container.appendChild(questionCard);
+        }
+    });
+    
+    // Thêm event listener cho các textarea mới
+    document.querySelectorAll('.answer-area').forEach(textarea => {
+        textarea.addEventListener('input', updateSidebarPreview);
+    });
+}
+
 // Khởi tạo sidebar
 function initSidebar() {
     updateSidebarPreview();
@@ -66,14 +177,12 @@ function updateSidebarPreview() {
     let answeredCount = 0;
     let unansweredCount = 0;
     
-    const questions = [
-        { id: 1, label: 'Câu 1' },
-        { id: 2, label: 'Câu 2' },
-        { id: 3, label: 'Câu 3 (a,b,c,d)' },
-        { id: 4, label: 'Câu 4' }
-    ];
-    
-    questions.forEach(q => {
+    // Sử dụng thứ tự đã xáo trộn
+    shuffledQuestions.forEach((question, displayIndex) => {
+        const q = {
+            id: question.originalId,
+            label: `Câu ${displayIndex + 1}${question.originalId === 3 ? ' (a,b,c,d)' : ''}`
+        };
         const item = document.createElement('div');
         item.className = 'question-item';
         
@@ -125,12 +234,12 @@ function updateSidebarPreview() {
         }
         
         item.innerHTML = `
-            <div class="question-number-badge">${q.id}</div>
+            <div class="question-number-badge">${displayIndex + 1}</div>
             <div class="question-status">${status}</div>
             <div class="question-icon">${icon}</div>
         `;
         
-        item.onclick = () => scrollToQuestion(q.id);
+        item.onclick = () => scrollToQuestion(displayIndex);
         sidebarContent.appendChild(item);
     });
     
@@ -142,15 +251,15 @@ function updateSidebarPreview() {
 }
 
 // Hàm cuộn đến câu hỏi
-function scrollToQuestion(questionId) {
+function scrollToQuestion(displayIndex) {
     const questionCards = document.querySelectorAll('.question-card');
-    if (questionCards[questionId - 1]) {
-        questionCards[questionId - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (questionCards[displayIndex]) {
+        questionCards[displayIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
         
         // Highlight câu hỏi
-        questionCards[questionId - 1].style.boxShadow = '0 0 20px rgba(168, 237, 234, 0.8)';
+        questionCards[displayIndex].style.boxShadow = '0 0 20px rgba(168, 237, 234, 0.8)';
         setTimeout(() => {
-            questionCards[questionId - 1].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+            questionCards[displayIndex].style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
         }, 2000);
     }
     
@@ -335,4 +444,7 @@ function submitAll() {
 }
 
 // Khởi tạo khi trang load
-window.onload = initSidebar;
+window.onload = function() {
+    initQuestions();
+    initSidebar();
+};

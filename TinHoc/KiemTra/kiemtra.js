@@ -257,6 +257,7 @@ function shuffleArray(array) {
 
 // Biến lưu trữ câu hỏi đã xáo trộn
 let shuffledTracnghiem = [];
+let shuffledTuluan = [];
 let tuluanResults = {};
 let isSubmitted = false;
 
@@ -327,15 +328,19 @@ function renderTracnghiem() {
 
 // Khởi tạo tự luận
 function initTuluan() {
+    // Xáo trộn câu hỏi tự luận
+    shuffledTuluan = shuffleArray(tuluanData.map((q, idx) => ({ ...q, originalIndex: idx })));
+    
     const container = document.getElementById('tuluanForm');
     container.innerHTML = '';
     
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q, displayIndex) => {
         const questionCard = document.createElement('div');
         questionCard.className = 'question-card';
+        questionCard.setAttribute('data-original-index', q.originalIndex);
         
         let html = `
-            <span class="question-number">Câu ${index + 1}</span>
+            <span class="question-number">Câu ${displayIndex + 1}</span>
             <div class="question-text">${q.question}</div>
         `;
         
@@ -344,15 +349,15 @@ function initTuluan() {
                 html += `
                     <div class="sub-question">
                         <label class="sub-question-label">${sub.text}</label>
-                        <textarea class="answer-area" id="tl-${index}-${sub.id}" placeholder="Nhập câu trả lời của em..."></textarea>
+                        <textarea class="answer-area" id="tl-${q.originalIndex}-${sub.id}" placeholder="Nhập câu trả lời của em..."></textarea>
                     </div>
                 `;
             });
         } else {
-            html += `<textarea class="answer-area" id="tl-${index}" placeholder="Nhập câu trả lời của em vào đây..."></textarea>`;
+            html += `<textarea class="answer-area" id="tl-${q.originalIndex}" placeholder="Nhập câu trả lời của em vào đây..."></textarea>`;
         }
         
-        html += `<div class="result-display" id="tl-result-${index}"></div>`;
+        html += `<div class="result-display" id="tl-result-${q.originalIndex}"></div>`;
         questionCard.innerHTML = html;
         container.appendChild(questionCard);
     });
@@ -448,15 +453,15 @@ function checkTracnghiem() {
 function checkTuluan() {
     let totalScore = 0;
     
-    tuluanData.forEach((q, index) => {
-        const resultDiv = document.getElementById(`tl-result-${index}`);
+    shuffledTuluan.forEach((q) => {
+        const resultDiv = document.getElementById(`tl-result-${q.originalIndex}`);
         
         if (q.subQuestions) {
             let subTotalScore = 0;
             let details = '';
             
             q.subQuestions.forEach(sub => {
-                const answer = document.getElementById(`tl-${index}-${sub.id}`).value.trim();
+                const answer = document.getElementById(`tl-${q.originalIndex}-${sub.id}`).value.trim();
                 const score = checkSimilarity(answer, sub.keywords);
                 subTotalScore += score;
                 
@@ -478,7 +483,7 @@ function checkTuluan() {
                 resultDiv.innerHTML = `❌ Chưa đúng! Điểm TB: ${Math.round(avgScore)}%${details}`;
             }
         } else {
-            const answer = document.getElementById(`tl-${index}`).value.trim();
+            const answer = document.getElementById(`tl-${q.originalIndex}`).value.trim();
             const similarity = checkSimilarity(answer, q.keywords);
             
             if (similarity >= 70) {
@@ -512,14 +517,14 @@ document.getElementById('submitBtn').addEventListener('click', function() {
     }
     
     let hasEmptyTL = false;
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q) => {
         if (q.subQuestions) {
             q.subQuestions.forEach(sub => {
-                const answer = document.getElementById(`tl-${index}-${sub.id}`).value.trim();
+                const answer = document.getElementById(`tl-${q.originalIndex}-${sub.id}`).value.trim();
                 if (!answer) hasEmptyTL = true;
             });
         } else {
-            const answer = document.getElementById(`tl-${index}`).value.trim();
+            const answer = document.getElementById(`tl-${q.originalIndex}`).value.trim();
             if (!answer) hasEmptyTL = true;
         }
     });
@@ -677,7 +682,7 @@ function updateSidebarPreview() {
     tlSection.className = 'sidebar-section';
     tlSection.innerHTML = '<h4>✍️ TỰ LUẬN (4 câu)</h4>';
     
-    tuluanData.forEach((q, index) => {
+    shuffledTuluan.forEach((q, displayIndex) => {
         const item = document.createElement('div');
         item.className = 'question-item';
         
@@ -687,7 +692,7 @@ function updateSidebarPreview() {
         
         if (isSubmitted) {
             // Sau khi nộp bài
-            const resultDiv = document.getElementById(`tl-result-${index}`);
+            const resultDiv = document.getElementById(`tl-result-${q.originalIndex}`);
             if (resultDiv && resultDiv.classList.contains('correct')) {
                 item.classList.add('correct');
                 status = 'Đúng';
@@ -706,12 +711,12 @@ function updateSidebarPreview() {
             if (q.subQuestions) {
                 let allAnswered = true;
                 q.subQuestions.forEach(sub => {
-                    const answer = document.getElementById(`tl-${index}-${sub.id}`)?.value.trim();
+                    const answer = document.getElementById(`tl-${q.originalIndex}-${sub.id}`)?.value.trim();
                     if (!answer) allAnswered = false;
                 });
                 hasAnswer = allAnswered;
             } else {
-                const answer = document.getElementById(`tl-${index}`)?.value.trim();
+                const answer = document.getElementById(`tl-${q.originalIndex}`)?.value.trim();
                 hasAnswer = answer && answer.length > 0;
             }
             
@@ -729,12 +734,12 @@ function updateSidebarPreview() {
         }
         
         item.innerHTML = `
-            <div class="question-number-badge">TL${index + 1}</div>
+            <div class="question-number-badge">TL${displayIndex + 1}</div>
             <div class="question-status">${status}</div>
             <div class="question-icon">${icon}</div>
         `;
         
-        item.onclick = () => scrollToTuluan(index);
+        item.onclick = () => scrollToTuluan(displayIndex);
         tlSection.appendChild(item);
     });
     
