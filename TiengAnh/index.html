@@ -3,1116 +3,608 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Adventure - Bé Học Tiếng Anh</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <title>Bé Học Tiếng Anh Vui Nhộn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #FF6B6B; /* Đỏ dâu */
-            --secondary: #4ECDC4; /* Xanh ngọc */
-            --accent: #FFE66D; /* Vàng nắng */
-            --bg: #F7FFF7; /* Trắng ngà */
-            --text: #2F2E41; /* Xám đậm */
-            --correct: #5AC85A; /* Xanh lá cho đáp án đúng */
-            --wrong: #FF3B30; /* Đỏ cho đáp án sai */
-            --modal-bg: rgba(0, 0, 0, 0.5);
-        }
-
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-bottom: 30px;
-        }
-
-        header {
-            background-color: var(--primary);
-            width: 100%;
-            padding: 20px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 { font-size: 2.2rem; margin: 0; }
-        p { margin: 5px 0 0 0; }
-
-        .container {
-            max-width: 800px;
-            width: 90%;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        /* Menu Chọn Chủ Đề */
-        .categories {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .category-btn, .action-btn {
-            padding: 20px;
-            border: none;
-            border-radius: 20px;
-            background: white;
-            box-shadow: 0 6px 0 #ddd;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1.1rem;
-            font-weight: bold;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .category-btn:hover, .action-btn:hover { transform: translateY(-3px); }
-        .category-btn:active, .action-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #ddd; }
-
-        .action-btn {
-            background-color: var(--accent);
-            box-shadow: 0 6px 0 #D4B959;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .special-btn {
-            background: linear-gradient(45deg, #FF6B6B, #FFE66D);
-            color: white;
-            grid-column: 1 / -1; /* Chiếm toàn bộ chiều ngang */
-            font-size: 1.3rem;
-            box-shadow: 0 6px 0 #d45a5a;
-        }
-
-        /* Vùng Học Tập & Kiểm tra */
-        #game-zone, #quiz-zone, #vocab-list-zone, #edit-zone {
-            display: none;
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            position: relative;
-            text-align: left;
-        }
-
-        .zone-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .btn-back {
-            background: #eee;
-            color: var(--text);
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            border: none;
-            cursor: pointer;
-        }
-
-        .score-board {
-            font-size: 1.2rem;
-            color: var(--secondary);
-            font-weight: bold;
-        }
-        
-        /* Flashcard Styling */
-        .card-display { text-align: center; }
-
-        .card {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-
-        .card.active { animation: bounce 1s infinite alternate; }
-
-        .word-text {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 10px;
-            text-transform: capitalize;
-        }
-
-        .translation, .card-emoji {
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .translation.visible, .card-emoji.visible {
-            opacity: 1;
-        }
-
-        .translation {
-            font-size: 1.5rem;
-            color: #666;
-            font-style: italic;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-            transition: background-color 0.2s;
-        }
-
-        .btn-speak { background: var(--secondary); color: white; }
-        .btn-next { background: var(--primary); color: white; }
-        .btn-show { background: var(--accent); color: var(--text); }
-
-        /* Quiz & Write Styling */
-        .quiz-question {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .quiz-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .option-btn {
-            padding: 15px;
-            border: 3px solid var(--secondary);
-            border-radius: 15px;
-            background: white;
-            cursor: pointer;
-            font-size: 1.2rem;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .option-btn:hover:not(.disabled) {
-            background: var(--secondary);
-            color: white;
-        }
-
-        .option-btn.correct { background: var(--correct); color: white; border-color: var(--correct); }
-        .option-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); }
-        .option-btn.disabled { opacity: 0.7; pointer-events: none; }
-        
-        #write-answer-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.5rem;
-            text-align: center;
-            border: 3px solid var(--secondary);
-            border-radius: 15px;
-            box-sizing: border-box;
-            text-transform: lowercase;
-        }
-
-        /* Vocab List & Edit Styling */
-        #vocab-content {
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .vocab-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px dashed #eee;
-            font-size: 1.1rem;
-        }
-
-        .vocab-item span:first-child { font-weight: bold; color: var(--primary); }
-        .vocab-item span:last-child { color: #666; }
-        
-        .delete-word-btn {
-            background: var(--wrong);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-        
-        .edit-input, .edit-select {
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 10px; 
-            border-radius: 8px; 
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        /* Custom Modal Styling */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--modal-bg);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: bounce 0.3s;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .modal-body {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            color: #555;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        @keyframes bounce {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
+        body { font-family: 'Quicksand', sans-serif; background-color: #f0f9ff; }
+        .card-bounce:hover { transform: scale(1.05); transition: all 0.2s ease-in-out; }
+        .unit-btn-active { background: #f59e0b !important; color: white !important; transform: scale(1.1); }
+        .quiz-option:active { transform: scale(0.95); }
+        .writing-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
     </style>
 </head>
 <body>
+    <div id="root"></div>
 
-<header>
-    <h1>🌟 English Adventure 🌟</h1>
-    <p>Học mà chơi, cực kỳ vui!</p>
-</header>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
-<div class="container">
-    <div id="menu">
-        <h2 style="text-align: center;">Chọn chủ đề và chế độ học:</h2>
-        
-        <div class="categories" id="category-list">
-            <!-- Chủ đề sẽ được tạo ở đây -->
-        </div>
+        const vocabularyData = [
+            { unit: 1, title: "Đồ chơi & Vật dụng", words: [
+                { en: "doll", vi: "búp bê", icon: "🪆" }, { en: "ball", vi: "quả bóng", icon: "⚽" },
+                { en: "teddy bear", vi: "gấu bông", icon: "🧸" }, { en: "car", vi: "xe hơi", icon: "🚗" },
+                { en: "kite", vi: "con diều", icon: "🪁" }, { en: "bike", vi: "xe đạp", icon: "🚲" },
+                { en: "train", vi: "tàu hỏa", icon: "🚂" }, { en: "apple", vi: "quả táo", icon: "🍎" },
+                { en: "bat", vi: "cái gậy", icon: "🏏" }
+            ]},
+            { unit: 2, title: "Lớp học của em", words: [
+                { en: "pen", vi: "bút mực", icon: "🖋️" }, { en: "eraser", vi: "cục tẩy", icon: "🧼" },
+                { en: "pencil", vi: "bút chì", icon: "✏️" }, { en: "pencil case", vi: "hộp bút", icon: "👝" },
+                { en: "book", vi: "quyển sách", icon: "📖" }, { en: "bag", vi: "cái túi", icon: "🎒" },
+                { en: "door", vi: "cái cửa", icon: "🚪" }, { en: "window", vi: "cửa sổ", icon: "🪟" },
+                { en: "cat", vi: "con mèo", icon: "🐱" }, { en: "cookie", vi: "bánh quy", icon: "🍪" },
+                { en: "desk", vi: "bàn học", icon: " desk" }, { en: "dog", vi: "con chó", icon: "🐶" }
+            ]},
+            { unit: 3, title: "Gia đình & Động vật", words: [
+                { en: "mom", vi: "mẹ", icon: "👩" }, { en: "dad", vi: "ba", icon: "👨" },
+                { en: "sister", vi: "chị/em gái", icon: "👧" }, { en: "brother", vi: "anh/em trai", icon: "👦" },
+                { en: "aunt", vi: "dì/cô", icon: "👩‍🦱" }, { en: "uncle", vi: "chú/bác", icon: "👨‍🦱" },
+                { en: "cousin", vi: "anh em họ", icon: "🧒" }, { en: "egg", vi: "quả trứng", icon: "🥚" },
+                { en: "elephant", vi: "con voi", icon: "🐘" }, { en: "fan", vi: "cái quạt", icon: "🪭" },
+                { en: "fig", vi: "quả sung", icon: "🫐" }
+            ]},
+            { unit: 4, title: "Động vật & Kích thước", words: [
+                { en: "giraffe", vi: "hươu cao cổ", icon: "🦒" }, { en: "monkey", vi: "con khỉ", icon: "🐒" },
+                { en: "big", vi: "to lớn", icon: "🐘" }, { en: "tall", vi: "cao", icon: "🦒" },
+                { en: "little", vi: "nhỏ bé", icon: "🐁" }, { en: "bird", vi: "con chim", icon: "🐦" },
+                { en: "fish", vi: "con cá", icon: "🐟" }, { en: "goat", vi: "con dê", icon: "🐐" },
+                { en: "gift", vi: "món quà", icon: "🎁" }, { en: "hat", vi: "cái mũ", icon: "👒" },
+                { en: "hamster", vi: "chuột hamster", icon: "🐹" }
+            ]},
+            { unit: 5, title: "Thức ăn & Đồ uống", words: [
+                { en: "rice", vi: "cơm", icon: "🍚" }, { en: "meat", vi: "thịt", icon: "🥩" },
+                { en: "carrots", vi: "cà rốt", icon: "🥕" }, { en: "yogurt", vi: "sữa chua", icon: "🍦" },
+                { en: "bread", vi: "bánh mì", icon: "🍞" }, { en: "milk", vi: "sữa", icon: "🥛" },
+                { en: "juice", vi: "nước trái cây", icon: "🧃" }, { en: "water", vi: "nước", icon: "💧" },
+                { en: "ink", vi: "mực", icon: "🖋️" }, { en: "ill", vi: "ốm", icon: "🤒" },
+                { en: "jacket", vi: "áo khoác", icon: "🧥" }, { en: "jelly", vi: "mứt/thạch", icon: "🍯" }
+            ]},
+            { unit: 6, title: "Miêu tả ngoại hình", words: [
+                { en: "long", vi: "dài", icon: "📏" },
+                { en: "short", vi: "ngắn", icon: "📐", wordId: "short_ngan" },
+                { en: "black", vi: "màu đen", icon: "⬛" }, { en: "curly", vi: "tóc xoăn", icon: "👩‍🦱" },
+                { en: "straight", vi: "tóc thẳng", icon: "👩" }, { en: "thin", vi: "gầy/mỏng", icon: "🧍" },
+                { en: "lion", vi: "sư tử", icon: "🦁" },
+                { en: "short", vi: "thấp", icon: "🧍‍♂️", wordId: "short_thap" }
+            ]},
+            { unit: 7, title: "Trang phục", words: [
+                { en: "skirt", vi: "chân váy", icon: "👗" }, { en: "scarf", vi: "khăn quàng", icon: "🧣" },
+                { en: "jeans", vi: "quần bò", icon: "👖" }, { en: "boots", vi: "ủng/bốt", icon: "👢" },
+                { en: "shirt", vi: "áo sơ mi", icon: "👕" }, { en: "t-shirt", vi: "áo phông", icon: "👕" },
+                { en: "dress", vi: "váy dài", icon: "👗" }, { en: "shoes", vi: "đôi giày", icon: "👟" },
+                { en: "chair", vi: "cái ghế", icon: "🪑" }, { en: "three", vi: "số 3", icon: "3️⃣" }
+            ]},
+            { unit: 8, title: "Hành động & Đồ vật", words: [
+                { en: "play", vi: "chơi", icon: "🎮" }, { en: "dance", vi: "nhảy múa", icon: "💃" },
+                { en: "sing", vi: "hát", icon: "🎤" }, { en: "eat", vi: "ăn", icon: "🍽️" },
+                { en: "talk", vi: "nói chuyện", icon: "💬" }, { en: "watch", vi: "xem", icon: "📺" },
+                { en: "drum", vi: "cái trống", icon: "🥁" }, { en: "truck", vi: "xe tải", icon: "🚚" },
+                { en: "tree", vi: "cái cây", icon: "🌳" }, { en: "crab", vi: "con cua", icon: "🦀" }, 
+                { en: "wash the car", vi: "rửa xe", icon: "🚗" }, { en: "brush my hair", vi: "chải tóc", icon: "🧼" }, 
+                { en: "take photos", vi: "chụp ảnh", icon: "📸" }
+            ]},
+            { unit: 9, title: "Vận động & Thiên nhiên", words: [
+                { en: "play soccer", vi: "đá bóng", icon: "⚽" }, { en: "ride a bike", vi: "đi xe đạp", icon: "🚴" },
+                { en: "run", vi: "chạy", icon: "🏃" }, { en: "catch", vi: "bắt lấy", icon: "🧤" },
+                { en: "fly", vi: "bay", icon: "🕊️" }, { en: "jump", vi: "nhảy", icon: "🦘" },
+                { en: "read", vi: "đọc", icon: "📖" }, { en: "write", vi: "viết", icon: "📝" },
+                { en: "rain", vi: "mưa", icon: "🌧️" }, { en: "sky", vi: "bầu trời", icon: "☁️" }
+            ]},
+            { unit: 10, title: "Hoạt động & Tính từ", words: [
+                { en: "take a photo", vi: "chụp ảnh", icon: "📸" }, { en: "draw a picture", vi: "vẽ tranh", icon: "🎨" },
+                { en: "old", vi: "cũ/già", icon: "👴" }, { en: "new", vi: "mới", icon: "✨" },
+                { en: "great", vi: "tuyệt vời", icon: "⭐" }, { en: "boat", vi: "con thuyền", icon: "⛵" },
+                { en: "toy", vi: "đồ chơi", icon: "🧸" }, { en: "boy", vi: "cậu bé", icon: "👦" }, 
+                { en: "listen to an audio guide", vi: "nghe hướng dẫn bằng tiếng Anh", icon: "🎧" }, 
+                { en: "visit the gift shop", vi: "ghé thăm cửa hàng quà tặng", icon: "🎁" }
+                
+            ]},
+            { unit: 11, title: "Phòng ngủ & Cảm xúc", words: [
+                { en: "rug", vi: "thảm", icon: "🧶" }, { en: "cabinet", vi: "tủ đựng", icon: "🗄️" },
+                { en: "shelf", vi: "giá sách", icon: "📚" }, { en: "pillow", vi: "cái gối", icon: "🛌" },
+                { en: "blanket", vi: "cái chăn", icon: "🛌" }, { en: "ear", vi: "cái tai", icon: "👂" },
+                { en: "scared", vi: "sợ hãi", icon: "😨" }, { en: "share", vi: "chia sẻ", icon: "🤝" },
+                { en: "square", vi: "hình vuông", icon: "⏹️" }, { en: "near", vi: "gần", icon: "🛌" }, 
+                { en: "hear", vi: "nghe", icon: "🛌" }
+            ]},
+            { unit: 12, title: "Nhà cửa", words: [
+                { en: "table", vi: "cái bàn", icon: "🪑" }, { en: "computer", vi: "máy tính", icon: "💻" },
+                { en: "board", vi: "cái bảng", icon: "🏫" }, { en: "poster", vi: "áp phích", icon: "🖼️" },
+                { en: "picture", vi: "bức tranh", icon: "🖼️" }, { en: "mouse", vi: "con chuột", icon: "🐭" },
+                { en: "house", vi: "ngôi nhà", icon: "🏠" }, { en: "drawers", vi: "tủ", icon: "🗄️" },
+                { en: "poor", vi: "nghèo", icon: "🚪" }, { en: "tour", vi: "tham quan", icon: "🎫" }
+            ]}
+        ];
 
-        <button class="action-btn" style="background-color: #3B7E20; color: white; box-shadow: 0 6px 0 #2A5A1A; margin-top: 20px;" onclick="showEditZone()">➕ Quản lý Từ Vựng</button> 
-
-        <div id="mode-selection" style="display:none; margin-top: 20px; text-align: center;">
-            <h3 id="selected-category-title"></h3>
-            <button class="action-btn" onclick="startLearning('study')">📚 Chế độ Học (Flashcard)</button>
-            <button class="action-btn" onclick="startLearning('quiz')">✍️ Chế độ Kiểm tra (Trắc nghiệm)</button>
-            <button class="action-btn" style="background-color: var(--primary); color: white; box-shadow: 0 6px 0 #D45A5A;" onclick="startLearning('write')">📝 Chế độ Viết (Type Answer)</button>
-            <button class="action-btn" onclick="viewVocabularyList()">📖 Xem Từ Vựng</button>
-            <button class="btn-back" style="margin-top: 20px;" onclick="resetMenu()">⬅ Quay lại Menu</button>
-        </div>
-    </div>
-
-    <!-- Vùng Học Tập (Flashcards) -->
-    <div id="game-zone">
-        <div class="zone-header">
-            <button class="btn-back" onclick="showModeSelection()">⬅ Quay lại</button>
-            <h3 id="study-title">Học Chủ đề</h3>
-            <div class="score-board" id="study-progress">Tiến độ: 1/10</div>
-        </div>
-        
-        <div class="card-display">
-            <div class="card card-emoji" id="card-emoji"></div>
-            <div class="word-text" id="card-word"></div>
-            <div class="translation" id="card-vn"></div>
-        </div>
-        
-        <div class="nav-buttons">
-            <button class="btn btn-show" id="btn-show-meaning" onclick="toggleMeaning()">✨ Hiện nghĩa</button>
-            <button class="btn btn-speak" onclick="speak()">🔊 Nghe đọc</button>
-            <button class="btn btn-next" onclick="nextQuestion()">Từ tiếp theo ➡</button>
-        </div>
-    </div>
-
-    <!-- Vùng Kiểm tra (Quiz & Write) -->
-    <div id="quiz-zone">
-        <div class="zone-header">
-            <button class="btn-back" onclick="showModeSelection()">⬅ Quay lại</button>
-            <h3 id="quiz-title">Kiểm tra Chủ đề</h3>
-            <div class="score-board" id="quiz-progress">Câu hỏi: 1/10</div>
-        </div>
-
-        <div class="quiz-container">
-            <div class="quiz-question" id="quiz-question"></div>
-            
-            <div class="quiz-options" id="quiz-options"></div>
-
-            <div id="write-mode-controls" style="display: none; text-align: center;">
-                <input type="text" id="write-answer-input" class="edit-input" placeholder="Nhập từ tiếng Anh..." autocomplete="off">
-                <button class="btn btn-speak" id="write-check-btn" style="width: 100%; background: #00A693; margin-top: 10px;" onclick="checkWriteAnswer()">✅ Kiểm tra</button>
-            </div>
-
-            <p id="quiz-feedback" style="margin-top: 20px; font-weight: bold; min-height: 20px; text-align: center;"></p>
-            <button class="btn btn-next" id="quiz-next-btn" onclick="nextQuestion()" style="display:none; margin: 0 auto;">Câu tiếp theo ➡</button>
-        </div>
-    </div>
-
-    <!-- Vùng Xem Từ Vựng -->
-    <div id="vocab-list-zone">
-        <div class="zone-header">
-            <button class="btn-back" onclick="showModeSelection()">⬅ Quay lại</button>
-            <h3 id="vocab-title">Danh sách Từ Vựng</h3>
-        </div>
-        <div id="vocab-content"></div>
-    </div>
-
-    <!-- Vùng Chỉnh Sửa Từ Vựng -->
-    <div id="edit-zone">
-        <div class="zone-header">
-            <button class="btn-back" onclick="resetMenu()">⬅ Quay lại Menu</button>
-            <h3 id="edit-title">Quản lý Từ Vựng</h3>
-            <div></div>
-        </div>
-        
-        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-            <h4>1. Thêm Chủ đề mới</h4>
-            <input type="text" id="new-category-name" placeholder="Tên chủ đề (ví dụ: Hoa Quả)" class="edit-input">
-            <button class="btn btn-speak" style="width: 100%; background: #00A693;" onclick="addCategory()">➕ Thêm Chủ đề</button>
-        </div>
-
-        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-            <h4>2. Thêm Từ Vựng vào Chủ đề</h4>
-            <select id="add-category-select" class="edit-select"></select>
-            <input type="text" id="new-word-en" placeholder="Từ tiếng Anh (ví dụ: banana)" class="edit-input">
-            <input type="text" id="new-word-vn" placeholder="Nghĩa tiếng Việt (ví dụ: quả chuối)" class="edit-input">
-            <input type="text" id="new-word-icon" placeholder="Emoji/Icon (ví dụ: 🍌)" class="edit-input">
-            <button class="btn btn-speak" style="width: 100%; background: var(--secondary);" onclick="addWordToCategory()">➕ Thêm Từ</button>
-        </div>
-        
-        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 15px;">
-            <h4>3. Xóa Dữ Liệu</h4>
-            <h5 style="margin-top: 20px;">🗑️ Xóa Chủ đề</h5>
-            <select id="delete-category-select" class="edit-select"></select>
-            <button class="btn btn-next" style="width: 100%; background: var(--wrong);" onclick="deleteCategory()">🗑️ Xóa Chủ đề</button>
-
-            <h5 style="margin-top: 20px;">🗑️ Xóa Từ Vựng</h5>
-            <select id="manage-category-select" class="edit-select" onchange="loadWordsForDeletion()">
-                <option value="">-- Chọn Chủ đề --</option>
-            </select>
-            <div id="word-deletion-list" style="margin-top: 15px; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
-                <p style="text-align: center; color: #999;">Chọn chủ đề để xem danh sách.</p>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Custom Modal -->
-<div id="custom-modal" class="modal-overlay">
-    <div class="modal-box">
-        <h3 id="modal-title" class="modal-title">Thông báo</h3>
-        <p id="modal-msg" class="modal-body"></p>
-        <div id="modal-input-container" style="display:none;">
-            <input type="text" id="modal-input-field" class="modal-input">
-        </div>
-        <div class="modal-buttons">
-            <button id="modal-btn-cancel" class="btn btn-back" style="background: #ddd;">Hủy</button>
-            <button id="modal-btn-ok" class="btn btn-next">Đồng ý</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Dữ liệu mặc định (Updated)
-    const defaultVocabulary = {
-        "Số đếm (Numbers)": [
-            {en: "one", vn: "một", icon: "1️⃣"}, {en: "two", vn: "hai", icon: "2️⃣"},
-            {en: "three", vn: "ba", icon: "3️⃣"}, {en: "four", vn: "bốn", icon: "4️⃣"},
-            {en: "five", vn: "năm", icon: "5️⃣"}, {en: "six", vn: "sáu", icon: "6️⃣"},
-            {en: "seven", vn: "bảy", icon: "7️⃣"}, {en: "eight", vn: "tám", icon: "8️⃣"},
-            {en: "nine", vn: "chín", icon: "9️⃣"}, {en: "ten", vn: "mười", icon: "🔟"},
-            {en: "eleven", vn: "mười một", icon: "1️⃣1️⃣"}, {en: "twelve", vn: "mười hai", icon: "1️⃣2️⃣"},
-            {en: "thirteen", vn: "mười ba", icon: "1️⃣3️⃣"}, {en: "fourteen", vn: "mười bốn", icon: "1️⃣4️⃣"},
-            {en: "fifteen", vn: "mười lăm", icon: "1️⃣5️⃣"}, {en: "sixteen", vn: "mười sáu", icon: "1️⃣6️⃣"},
-            {en: "seventeen", vn: "mười bảy", icon: "1️⃣7️⃣"}, {en: "eighteen", vn: "mười tám", icon: "1️⃣8️⃣"},
-            {en: "nineteen", vn: "mười chín", icon: "1️⃣9️⃣"}, {en: "twenty", vn: "hai mươi", icon: "2️⃣0️⃣"}
-        ],
-        "Màu sắc (Colors)": [
-            {en: "red", vn: "màu đỏ", icon: "🔴"}, {en: "brown", vn: "màu nâu", icon: "🟤"},
-            {en: "pink", vn: "màu hồng", icon: "🌸"}, {en: "green", vn: "màu xanh lá", icon: "🟢"},
-            {en: "black", vn: "màu đen", icon: "⚫"}, {en: "yellow", vn: "màu vàng", icon: "🟡"},
-            {en: "orange", vn: "màu cam", icon: "🟠"}, {en: "blue", vn: "màu xanh dương", icon: "🔵"},
-            {en: "gray", vn: "màu xám", icon: "🌫️"}, {en: "white", vn: "màu trắng", icon: "⚪"},
-            {en: "purple", vn: "màu tím", icon: "🟣"}, {en: "light blue", vn: "màu xanh nhạt", icon: "💠"},
-            {en: "dark blue", vn: "màu xanh đậm", icon: "🔷"}
-        ],
-        "Lớp học (Classroom)": [
-            {en: "sit down", vn: "ngồi xuống", icon: "🪑"}, {en: "stand up", vn: "đứng lên", icon: "🚶"},
-            {en: "open your book", vn: "mở sách ra", icon: "📖"}, {en: "close your book", vn: "đóng sách lại", icon: "📘"},
-            {en: "don't talk", vn: "không nói chuyện", icon: "🤫"}
-        ],
-        "Đồ chơi (Toys)": [
-            {en: "doll", vn: "búp bê", icon: "🪆"}, {en: "ball", vn: "quả bóng", icon: "⚽"},
-            {en: "teddy bear", vn: "gấu bông", icon: "🧸"}, {en: "car", vn: "xe ô tô", icon: "🚗"},
-            {en: "bike", vn: "xe đạp", icon: "🚲"}, {en: "train", vn: "tàu hỏa", icon: "🚂"},
-            {en: "toy", vn: "đồ chơi", icon: "🧸"}
-        ],
-        "Dụng cụ học tập (School)": [
-            {en: "pen", vn: "bút bi", icon: "🖊️"}, {en: "eraser", vn: "cục tẩy", icon: "🧼"},
-            {en: "pencil", vn: "bút chì", icon: "✏️"}, {en: "pencil case", vn: "hộp bút", icon: "👝"},
-            {en: "book", vn: "quyển sách", icon: "📚"}, {en: "bag", vn: "cặp sách", icon: "🎒"},
-            {en: "door", vn: "cửa", icon: "🚪"}, {en: "window", vn: "cửa sổ", icon: "🪟"},
-            {en: "desk", vn: "bàn học", icon: "🗄️"}
-        ],
-        "Gia đình (Family)": [
-            {en: "mom", vn: "mẹ", icon: "👩"}, {en: "dad", vn: "bố", icon: "👨"},
-            {en: "sister", vn: "chị/em gái", icon: "👧"}, {en: "brother", vn: "anh/em trai", icon: "👦"},
-            {en: "family", vn: "gia đình", icon: "👨‍👩‍👧‍👦"}, {en: "aunt", vn: "cô/dì", icon: "🧕"},
-            {en: "uncle", vn: "chú/bác", icon: "🧔"}, {en: "cousin", vn: "chú", icon: "🧑‍🤝‍🧑"}
-        ],
-        "Động vật (Animals)": [
-            {en: "cat", vn: "con mèo", icon: "🐱"}, {en: "dog", vn: "con chó", icon: "🐶"},
-            {en: "elephant", vn: "con voi", icon: "🐘"}, {en: "giraffe", vn: "hươu cao cổ", icon: "🦒"},
-            {en: "monkey", vn: "con khỉ", icon: "🐒"}, {en: "bird", vn: "con chim", icon: "🐦"},
-            {en: "fish", vn: "con cá", icon: "🐟"}, {en: "goat", vn: "con dê", icon: "🐐"},
-            {en: "hamster", vn: "chuột hamster", icon: "🐹"}, {en: "lion", vn: "sư tử", icon: "🦁"}
-        ],
-        "Đồ ăn (Food)": [
-            {en: "apple", vn: "quả táo", icon: "🍎"}, {en: "cookie", vn: "bánh quy", icon: "🍪"},
-            {en: "egg", vn: "quả trứng", icon: "🥚"}, {en: "fig", vn: "quả sung", icon: "🫐"},
-            {en: "rice", vn: "cơm", icon: "🍚"}, {en: "meat", vn: "thịt", icon: "🥩"},
-            {en: "carrots", vn: "cà rốt", icon: "🥕"}, {en: "yogurt", vn: "sữa chua", icon: "🍦"},
-            {en: "bread", vn: "bánh mì", icon: "🍞"}, {en: "milk", vn: "sữa", icon: "🥛"},
-            {en: "juice", vn: "nước ép", icon: "🧃"}, {en: "water", vn: "nước", icon: "💧"},
-            {en: "jelly", vn: "thạch", icon: "🍮"}, {en: "salad", vn: "rau trộn", icon: "🥗"},
-            {en: "fries", vn: "khoai tây chiên", icon: "🍟"}, {en: "tomatoes", vn: "cà chua", icon: "🍅"},
-            {en: "ice cream", vn: "kem", icon: "🍦"}, {en: "grapes", vn: "nho", icon: "🍇"}
-        ],
-        "Cơ thể (Body)": [
-            {en: "nose", vn: "mũi", icon: "👃"}, {en: "ears", vn: "tai", icon: "👂"},
-            {en: "eyes", vn: "mắt", icon: "👀"}, {en: "hair", vn: "tóc", icon: "💇"}
-        ],
-        "Đồ vật (Objects)": [
-            {en: "fan", vn: "quạt", icon: "🌬️"}, {en: "paint", vn: "sơn", icon: "🎨"},
-            {en: "gift", vn: "quà tặng", icon: "🎁"}, {en: "hat", vn: "mũ", icon: "👒"},
-            {en: "ink", vn: "mực", icon: "✒️"}, {en: "jacket", vn: "áo khoác", icon: "🧥"},
-            {en: "bat", vn: "gậy đánh bóng", icon: "🏏"}
-        ],
-        "Tính từ (Adjectives)": [
-            {en: "big", vn: "to lớn", icon: "🐘"}, {en: "tall", vn: "cao", icon: "🦒"},
-            {en: "little", vn: "nhỏ bé", icon: "🐜"}, {en: "long", vn: "dài", icon: "📏"},
-            {en: "short", vn: "ngắn", icon: "🤏"}, {en: "curly", vn: "xoăn", icon: "🌀"},
-            {en: "straight", vn: "thẳng", icon: "➖"}, {en: "thin", vn: "gầy", icon: "🥢"},
-            {en: "ill", vn: "ốm", icon: "🤒"}
-        ],
-        "Động từ & Mẫu câu (Verbs & Phrases)": [
-            {en: "say", vn: "nói", icon: "🗣️"},
-            {en: "I have brown eyes", vn: "Tôi có mắt màu nâu", icon: "👁️"},
-            {en: "I don't have long hair", vn: "Tôi không có tóc dài", icon: "💇‍♀️"},
-            {en: "He has short hair", vn: "Anh ấy có tóc ngắn", icon: "💇‍♂️"}
-        ]
-    };
-
-    const STORAGE_KEY = 'englishAdventureVocab';
-
-    // --- Quản lý dữ liệu ---
-    function loadVocabulary() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                const storedVocab = JSON.parse(stored);
-                // Giữ lại dữ liệu mặc định mới nhất, chỉ gộp nếu user có thêm từ mới riêng
-                // Logic này đảm bảo khi bạn cập nhật code, user sẽ thấy bộ từ mới
-                // Tuy nhiên, nếu user đã lưu 'numbers' cũ vào localStorage, nó có thể ghi đè bộ mới.
-                // Để ưu tiên bộ dữ liệu mới này, ta sẽ dùng defaultVocabulary làm gốc.
-                return { ...defaultVocabulary, ...storedVocab };
-            } catch (e) {
-                return defaultVocabulary;
-            }
-        }
-        return defaultVocabulary;
-    }
-
-    function saveVocabulary() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allVocabulary));
-    }
-
-    let allVocabulary = loadVocabulary();
-    
-    // Biến trạng thái
-    let selectedCategoryName = '';
-    let currentVocabulary = [];
-    let currentIndex = 0;
-    let currentQuizMode = 'quiz'; 
-    let quizData = [];
-    let quizScore = 0;
-    let isAllWordsMode = false; // Cờ đánh dấu chế độ "Tất cả"
-
-    // --- Modal System (Thay thế Alert/Confirm/Prompt) ---
-    function showModal(title, message, type = 'alert', callback = null) {
-        const modal = document.getElementById('custom-modal');
-        const titleEl = document.getElementById('modal-title');
-        const msgEl = document.getElementById('modal-msg');
-        const inputContainer = document.getElementById('modal-input-container');
-        const inputField = document.getElementById('modal-input-field');
-        const btnOk = document.getElementById('modal-btn-ok');
-        const btnCancel = document.getElementById('modal-btn-cancel');
-
-        titleEl.innerText = title;
-        msgEl.innerText = message;
-        
-        // Reset state
-        inputContainer.style.display = 'none';
-        inputField.value = '';
-        btnCancel.style.display = type === 'alert' ? 'none' : 'block';
-
-        if (type === 'prompt') {
-            inputContainer.style.display = 'block';
-            setTimeout(() => inputField.focus(), 100);
+        /** Khóa duy nhất mỗi dòng từ (cần khi trùng en khác nghĩa, vd hai "short") */
+        function getWordKey(w) {
+            return w.wordId != null ? w.wordId : w.en;
         }
 
-        modal.style.display = 'flex';
-
-        // Xử lý sự kiện click (Clean up old listeners to prevent stacking)
-        const newBtnOk = btnOk.cloneNode(true);
-        const newBtnCancel = btnCancel.cloneNode(true);
-        btnOk.parentNode.replaceChild(newBtnOk, btnOk);
-        btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
-
-        newBtnOk.onclick = () => {
-            modal.style.display = 'none';
-            if (callback) {
-                if (type === 'prompt') callback(inputField.value);
-                else callback(true);
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
             }
+            return a;
+        }
+
+        /** Chuẩn hóa & so khớp tiếng Việt linh hoạt hơn cho bài "Viết Việt" */
+        function collapseSpacesVi(s) {
+            return String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function stripVietnameseTones(s) {
+            return collapseSpacesVi(s)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd');
+        }
+
+        const VI_OPTIONAL_PREFIX = /^(cái|con|quả|ngôi|đôi|bức|cục|số)\s+/;
+
+        function stripOptionalClassifier(s) {
+            let t = collapseSpacesVi(s);
+            let prev;
+            do {
+                prev = t;
+                t = t.replace(VI_OPTIONAL_PREFIX, '').trim();
+            } while (t !== prev);
+            return t;
+        }
+
+        /** Tách các đáp án được phép từ trường vi (dấu / = lựa chọn thay thế) */
+        function getViAcceptablePhrases(viField) {
+            const raw = String(viField).trim();
+            const bySlash = raw.split('/').map(p => p.trim()).filter(Boolean);
+            const set = new Set();
+            set.add(raw);
+            bySlash.forEach(p => set.add(p));
+            return [...set];
+        }
+
+        function isViClassifierToken(t) {
+            const set = new Set(['con', 'cái', 'quả', 'ngôi', 'đôi', 'bức', 'cục', 'số', 'chiếc', 'màu']);
+            return set.has(collapseSpacesVi(t));
+        }
+
+        /** Không rút gọn còn từ đầu (dễ nhầm hoặc quá chung) */
+        const VI_BLOCK_FIRST_TOKEN_TONELESS = new Set(['di', 'nuoc']);
+
+        /** Một số từ: từ đầu của cụm không nên là đáp án đúng (vd: quyển ≠ quyển sách) */
+        const VI_DENY_FIRST_RELAX_EN = new Set(['book', 'square', 'share', 'pencil case']);
+
+        /** Thêm đáp án thủ công theo en (đồng bộ dấu với từ điển khi có thể) */
+        const VI_MANUAL_WRITE_EXTRA_BY_EN = {
+            dance: ['nhảy nhót', 'khiêu vũ'],
+            talk: ['nói'],
+            catch: ['bắt'],
+            'play soccer': ['đá banh', 'chơi bóng'],
+            'take a photo': ['chụp hình', 'chụp hình ảnh'],
+            'draw a picture': ['vẽ'],
+            juice: ['nước ép', 'ép trái cây'],
+            watch: ['xem tivi', 'coi'],
+            sing: ['ca hát'],
         };
 
-        newBtnCancel.onclick = () => {
-            modal.style.display = 'none';
-            if (callback && type !== 'alert') callback(false);
-        };
-    }
-
-    // --- Giao diện Menu ---
-    function initCategories() {
-        const categoryList = document.getElementById('category-list');
-        categoryList.innerHTML = '';
-        
-        // Nút Đặc Biệt: Ôn tập TẤT CẢ
-        const allBtn = document.createElement('button');
-        allBtn.className = 'category-btn special-btn';
-        allBtn.innerHTML = '🔀 Ôn tập TOÀN BỘ từ vựng';
-        allBtn.onclick = () => startAllWordsMode();
-        categoryList.appendChild(allBtn);
-
-        // Các chủ đề thường
-        const categories = Object.keys(allVocabulary).filter(key => allVocabulary[key] && allVocabulary[key].length > 0);
-        
-        categories.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.className = 'category-btn';
-            btn.innerText = `${cat} (${allVocabulary[cat].length})`;
-            btn.onclick = () => showModeSelection(cat);
-            categoryList.appendChild(btn);
-        });
-    }
-
-    function hideAllZones() {
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('game-zone').style.display = 'none';
-        document.getElementById('quiz-zone').style.display = 'none';
-        document.getElementById('vocab-list-zone').style.display = 'none';
-        document.getElementById('edit-zone').style.display = 'none';
-    }
-
-    function resetMenu() {
-        initCategories();
-        document.getElementById('mode-selection').style.display = 'none';
-        document.getElementById('menu').style.display = 'block';
-        document.getElementById('category-list').style.display = 'grid'; 
-    }
-
-    function showModeSelection(category) {
-        if (category) {
-            selectedCategoryName = category;
-            currentVocabulary = allVocabulary[category];
-            isAllWordsMode = false;
-        }
-        hideAllZones();
-        document.getElementById('selected-category-title').innerText = `Chủ đề: ${selectedCategoryName}`;
-        document.getElementById('mode-selection').style.display = 'block';
-        document.getElementById('menu').style.display = 'block';
-        document.getElementById('category-list').style.display = 'none';
-        
-        // Ẩn UI dư thừa
-        document.getElementById('quiz-options').style.display = 'none';
-        document.getElementById('write-mode-controls').style.display = 'none';
-    }
-
-    // --- Logic cho Chế độ "Tất cả" ---
-    function startAllWordsMode() {
-        // Gộp tất cả các mảng thành 1 mảng lớn
-        let allWords = [];
-        Object.values(allVocabulary).forEach(arr => {
-            allWords = allWords.concat(arr);
-        });
-
-        if (allWords.length === 0) {
-            showModal('Thông báo', 'Chưa có từ vựng nào để ôn tập.');
-            return;
+        function viCandidateMatchesUser(user, userNoTone, userStripped, cand) {
+            const c = collapseSpacesVi(cand);
+            const candNoTone = stripVietnameseTones(c);
+            const candStripped = stripOptionalClassifier(c);
+            if (user === c) return true;
+            if (userNoTone === candNoTone) return true;
+            if (userStripped === candStripped) return true;
+            if (stripVietnameseTones(userStripped) === stripVietnameseTones(candStripped)) return true;
+            return false;
         }
 
-        // Trộn ngẫu nhiên
-        shuffleArray(allWords);
-
-        selectedCategoryName = "TẤT CẢ CÁC TỪ";
-        currentVocabulary = allWords;
-        isAllWordsMode = true;
-
-        showModeSelection(null); // Hiển thị menu chọn chế độ (Học/Quiz/Viết)
-    }
-
-    // --- Chế độ Học (Flashcard) ---
-    function startLearning(mode) {
-        if (!currentVocabulary || currentVocabulary.length === 0) {
-            showModal('Lỗi', `Chủ đề này chưa có từ vựng.`);
-            return;
-        }
-
-        hideAllZones();
-        if (mode === 'study') {
-            document.getElementById('game-zone').style.display = 'block';
-            document.getElementById('study-title').innerText = `Học: ${selectedCategoryName}`;
-            currentIndex = 0;
-            updateCard();
-        } else if (mode === 'quiz') {
-            if (currentVocabulary.length < 4) {
-                showModal('Thông báo', "Cần ít nhất 4 từ để chơi Trắc nghiệm.");
-                showModeSelection(isAllWordsMode ? null : selectedCategoryName);
-                return;
+        function buildWriteViAcceptByEn(allWords) {
+            const multiFirstToneless = new Map();
+            for (const w of allWords) {
+                for (const phrase of getViAcceptablePhrases(w.vi)) {
+                    const c = collapseSpacesVi(phrase);
+                    const toks = c.split(/\s+/).filter(Boolean);
+                    if (toks.length < 2 || isViClassifierToken(toks[0])) continue;
+                    const k = stripVietnameseTones(toks[0]);
+                    if (!multiFirstToneless.has(k)) multiFirstToneless.set(k, new Set());
+                    multiFirstToneless.get(k).add(getWordKey(w));
+                }
             }
-            currentQuizMode = 'quiz';
-            document.getElementById('quiz-zone').style.display = 'block';
-            document.getElementById('quiz-title').innerText = `Trắc nghiệm: ${selectedCategoryName}`;
-            setupQuizUI('quiz');
-            setupQuiz();
-        } else if (mode === 'write') {
-            currentQuizMode = 'write';
-            document.getElementById('quiz-zone').style.display = 'block';
-            document.getElementById('quiz-title').innerText = `Viết từ: ${selectedCategoryName}`;
-            setupQuizUI('write');
-            setupWriteQuiz();
-        }
-    }
-
-    function updateCard() {
-        const item = currentVocabulary[currentIndex];
-        const emoji = document.getElementById('card-emoji');
-        const vn = document.getElementById('card-vn');
-        
-        emoji.classList.remove('visible');
-        vn.classList.remove('visible');
-        emoji.classList.add('active');
-
-        emoji.innerText = item.icon;
-        document.getElementById('card-word').innerText = item.en;
-        vn.innerText = item.vn;
-        document.getElementById('study-progress').innerText = `Từ: ${currentIndex + 1}/${currentVocabulary.length}`;
-        
-        speak(item.en); 
-    }
-
-    function toggleMeaning() {
-        document.getElementById('card-emoji').classList.add('visible');
-        document.getElementById('card-vn').classList.add('visible');
-        document.getElementById('card-emoji').classList.remove('active');
-    }
-
-    function nextQuestion() {
-        if (document.getElementById('game-zone').style.display === 'block') {
-            // Flashcard
-            currentIndex++;
-            if (currentIndex >= currentVocabulary.length) {
-                showModal('Hoàn thành', "Chúc mừng! Bạn đã học hết danh sách này! 🎉", 'alert', () => {
-                    showModeSelection(isAllWordsMode ? null : selectedCategoryName); 
-                });
-            } else {
-                updateCard();
+            const conflictFirstToneless = new Set();
+            for (const [k, ens] of multiFirstToneless) {
+                if (ens.size > 1) conflictFirstToneless.add(k);
             }
-        } else {
-            // Quiz
-            if (currentQuizMode === 'quiz') setupNextQuizQuestion();
-            else setupNextWriteQuestion();
-        }
-    }
-    
-    function speak(textOverride) {
-        // Ưu tiên đọc từ tham số truyền vào, nếu không thì lấy từ input (cho mode viết)
-        let text = textOverride;
-        if (!text) {
-             text = document.getElementById('write-answer-input').value;
-        }
-        
-        if (!text) return;
-        
-        // Hủy các lệnh đọc cũ để tránh chồng chéo
-        window.speechSynthesis.cancel();
 
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
-        msg.lang = 'en-US';
-        msg.rate = 0.8; 
-        window.speechSynthesis.speak(msg);
-    }
-
-    // --- Tiện ích ---
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
-
-    // --- Quiz Logic ---
-    function setupQuizUI(mode) {
-        const optionsEl = document.getElementById('quiz-options');
-        const writeControlsEl = document.getElementById('write-mode-controls');
-        const questionEl = document.getElementById('quiz-question');
-        
-        if (mode === 'quiz') {
-            optionsEl.style.display = 'grid';
-            writeControlsEl.style.display = 'none';
-        } else {
-            optionsEl.style.display = 'none';
-            writeControlsEl.style.display = 'block';
-            document.getElementById('write-answer-input').value = '';
-        }
-    }
-
-    function setupQuiz() {
-        // Clone mảng để không ảnh hưởng mảng gốc, nếu là chế độ "Tất cả" thì mảng đã trộn rồi
-        quizData = [...currentVocabulary];
-        if (!isAllWordsMode) shuffleArray(quizData);
-        
-        // Giới hạn 20 câu nếu danh sách quá dài (để tránh chán), trừ khi user muốn học hết thì bỏ slice
-        // Ở đây tôi giữ nguyên để học hết theo yêu cầu "kiểm tra một lần tất cả"
-        
-        currentIndex = 0;
-        quizScore = 0;
-        setupNextQuizQuestion();
-    }
-    
-    function setupNextQuizQuestion() {
-        const optionsElement = document.getElementById('quiz-options');
-        const feedbackElement = document.getElementById('quiz-feedback');
-        const nextBtn = document.getElementById('quiz-next-btn');
-        const questionElement = document.getElementById('quiz-question');
-        
-        optionsElement.innerHTML = '';
-        feedbackElement.innerHTML = '';
-        nextBtn.style.display = 'none';
-
-        if (currentIndex >= quizData.length) {
-            showModal('Kết quả', `Bạn trả lời đúng ${quizScore}/${quizData.length} câu!`, 'alert', () => {
-                showModeSelection(isAllWordsMode ? null : selectedCategoryName);
-            });
-            return;
-        }
-
-        const currentWord = quizData[currentIndex];
-        // Lấy đáp án sai từ TOÀN BỘ từ vựng để phong phú hơn (nếu có thể), hoặc lấy trong tập hiện tại
-        const options = getRandomOptions(currentWord, currentVocabulary.length > 10 ? currentVocabulary : Object.values(allVocabulary).flat());
-
-        // Đã xóa icon ${currentWord.icon} ở đầu câu hỏi để tránh nhắc bài
-        questionElement.innerHTML = `Nghĩa tiếng Việt của: <br><span style="font-weight: bold; color: var(--primary);">${currentWord.en}</span>`;
-        document.getElementById('quiz-progress').innerText = `Câu: ${currentIndex + 1}/${quizData.length}`;
-
-        options.forEach(option => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = option;
-            btn.onclick = (e) => checkQuizAnswer(e.target, option, currentWord.vn); 
-            optionsElement.appendChild(btn);
-        });
-        currentIndex++;
-    }
-
-    function getRandomOptions(correctAnswer, sourceArray) {
-        const options = new Set([correctAnswer.vn]);
-        // Tạo pool từ sourceArray
-        const wrongWords = sourceArray.filter(w => w.vn !== correctAnswer.vn);
-
-        while (options.size < 4 && wrongWords.length > 0) {
-            const rand = Math.floor(Math.random() * wrongWords.length);
-            options.add(wrongWords[rand].vn);
-            wrongWords.splice(rand, 1); // Tránh trùng lặp trong 1 câu
-        }
-        
-        let finalOptions = Array.from(options);
-        shuffleArray(finalOptions);
-        return finalOptions;
-    }
-
-    function checkQuizAnswer(btn, selected, correct) {
-        const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(b => b.classList.add('disabled'));
-
-        const feedback = document.getElementById('quiz-feedback');
-        const nextBtn = document.getElementById('quiz-next-btn');
-
-        // Lấy lại thông tin từ vựng hiện tại để hiển thị icon
-        const currentWord = quizData[currentIndex - 1];
-
-        if (selected === correct) {
-            btn.classList.add('correct');
-            feedback.style.color = 'var(--correct)';
-            // Thêm icon vào thông báo kết quả
-            feedback.innerText = `Chính xác! ${currentWord.icon} 🎉`;
-            quizScore++;
-            // Tự động đọc từ khi đúng
-            speak(currentWord.en);
-        } else {
-            btn.classList.add('wrong');
-            feedback.style.color = 'var(--wrong)';
-            // Thêm icon vào thông báo kết quả
-            feedback.innerText = `Sai rồi. Đáp án là: "${correct}" ${currentWord.icon}`;
-            allBtns.forEach(b => {
-                if (b.innerText === correct) b.classList.add('correct');
-            });
-        }
-        nextBtn.style.display = 'block';
-    }
-
-    // --- Write Logic ---
-    function setupWriteQuiz() {
-        quizData = [...currentVocabulary];
-        if (!isAllWordsMode) shuffleArray(quizData);
-        currentIndex = 0;
-        quizScore = 0;
-        setupNextWriteQuestion();
-    }
-    
-    function setupNextWriteQuestion() {
-        const feedback = document.getElementById('quiz-feedback');
-        const nextBtn = document.getElementById('quiz-next-btn');
-        const questionEl = document.getElementById('quiz-question');
-        const inputEl = document.getElementById('write-answer-input');
-        const checkBtn = document.getElementById('write-check-btn');
-
-        feedback.innerHTML = '';
-        nextBtn.style.display = 'none';
-        inputEl.value = '';
-        inputEl.disabled = false;
-        inputEl.style.borderColor = '#ccc';
-        checkBtn.disabled = false;
-        
-        if (currentIndex >= quizData.length) {
-            showModal('Kết quả', `Bạn viết đúng ${quizScore}/${quizData.length} từ!`, 'alert', () => {
-                showModeSelection(isAllWordsMode ? null : selectedCategoryName);
-            });
-            return;
-        }
-        
-        const currentWord = quizData[currentIndex];
-        questionEl.innerHTML = `Viết từ tiếng Anh cho nghĩa: <br><span style="font-weight: bold; color: var(--secondary);">${currentWord.vn}</span>`;
-        document.getElementById('quiz-progress').innerText = `Câu: ${currentIndex + 1}/${quizData.length}`;
-        
-        inputEl.focus();
-        currentIndex++;
-    }
-    
-    function checkWriteAnswer() {
-        const inputEl = document.getElementById('write-answer-input');
-        const feedback = document.getElementById('quiz-feedback');
-        const nextBtn = document.getElementById('quiz-next-btn');
-        const checkBtn = document.getElementById('write-check-btn');
-
-        const currentWord = quizData[currentIndex - 1]; 
-        const userAnswer = inputEl.value.trim().toLowerCase();
-        const correctAnswer = currentWord.en.toLowerCase();
-        
-        inputEl.disabled = true;
-        checkBtn.disabled = true;
-
-        if (userAnswer === correctAnswer) {
-            feedback.style.color = 'var(--correct)';
-            feedback.innerText = `Tuyệt vời! ${currentWord.icon}`;
-            inputEl.style.borderColor = 'var(--correct)';
-            quizScore++;
-            speak(currentWord.en);
-        } else {
-            feedback.style.color = 'var(--wrong)';
-            feedback.innerText = `Sai rồi. Đúng là: "${currentWord.en}"`;
-            inputEl.style.borderColor = 'var(--wrong)';
-            speak(currentWord.en); // Đọc đáp án đúng để bé nhớ
-        }
-        nextBtn.style.display = 'block';
-    }
-
-    // --- Quản lý Từ Vựng & Edit ---
-    function showEditZone() {
-        hideAllZones();
-        document.getElementById('edit-zone').style.display = 'block';
-        
-        const keys = Object.keys(allVocabulary).sort();
-
-        const setupSelect = (id, defaultText) => {
-            const el = document.getElementById(id);
-            el.innerHTML = `<option value="">${defaultText}</option>`;
-            keys.forEach(k => el.innerHTML += `<option value="${k}">${k}</option>`);
-        };
-
-        setupSelect('add-category-select', '-- Chọn Chủ đề --');
-        setupSelect('delete-category-select', '-- Chọn Chủ đề để xóa --');
-        setupSelect('manage-category-select', '-- Chọn Chủ đề để quản lý --');
-        
-        document.getElementById('word-deletion-list').innerHTML = '<p style="text-align: center; color: #999;">Chọn chủ đề để xem danh sách.</p>';
-    }
-
-    function addCategory() {
-        const name = document.getElementById('new-category-name').value.trim();
-        if (!name) return showModal('Lỗi', 'Vui lòng nhập tên chủ đề.');
-        if (allVocabulary[name]) return showModal('Lỗi', 'Chủ đề này đã tồn tại.');
-        
-        allVocabulary[name] = [];
-        saveVocabulary();
-        document.getElementById('new-category-name').value = '';
-        showModal('Thành công', `Đã thêm chủ đề "${name}"`, 'alert', () => showEditZone());
-    }
-
-    function addWordToCategory() {
-        const cat = document.getElementById('add-category-select').value;
-        const en = document.getElementById('new-word-en').value.trim();
-        const vn = document.getElementById('new-word-vn').value.trim();
-        const icon = document.getElementById('new-word-icon').value.trim() || '💡';
-
-        if (!cat) return showModal('Lỗi', 'Chưa chọn chủ đề.');
-        if (!en || !vn) return showModal('Lỗi', 'Vui lòng nhập đủ từ tiếng Anh và nghĩa tiếng Việt.');
-
-        // Check duplicate
-        const exists = allVocabulary[cat].some(w => w.en.toLowerCase() === en.toLowerCase());
-        if (exists) return showModal('Lỗi', `Từ "${en}" đã có trong chủ đề này.`);
-
-        allVocabulary[cat].push({ en, vn, icon });
-        saveVocabulary();
-        
-        // Clear inputs
-        document.getElementById('new-word-en').value = '';
-        document.getElementById('new-word-vn').value = '';
-        document.getElementById('new-word-icon').value = '';
-        
-        showModal('Thành công', `Đã thêm từ "${en}"!`, 'alert');
-    }
-
-    function deleteCategory() {
-        const cat = document.getElementById('delete-category-select').value;
-        if (!cat) return showModal('Lỗi', 'Chưa chọn chủ đề.');
-
-        showModal('Xác nhận', `Nhập tên chủ đề "${cat}" để xác nhận xóa vĩnh viễn:`, 'prompt', (input) => {
-            if (input === cat) {
-                delete allVocabulary[cat];
-                saveVocabulary();
-                showModal('Đã xóa', 'Xóa chủ đề thành công.', 'alert', () => showEditZone());
-            } else if (input !== false) {
-                showModal('Lỗi', 'Tên nhập không khớp.');
+            const relaxedByEn = new Map();
+            for (const w of allWords) {
+                const extras = [];
+                for (const phrase of getViAcceptablePhrases(w.vi)) {
+                    const c = collapseSpacesVi(phrase);
+                    const toks = c.split(/\s+/).filter(Boolean);
+                    if (toks.length < 2) continue;
+                    const first = toks[0];
+                    const last = toks[toks.length - 1];
+                    if (isViClassifierToken(first)) {
+                        if (last) extras.push(last);
+                    } else {
+                        if (
+                            !VI_DENY_FIRST_RELAX_EN.has(w.en) &&
+                            !conflictFirstToneless.has(stripVietnameseTones(first)) &&
+                            !VI_BLOCK_FIRST_TOKEN_TONELESS.has(stripVietnameseTones(first))
+                        ) {
+                            extras.push(first);
+                        }
+                    }
+                }
+                const manual = VI_MANUAL_WRITE_EXTRA_BY_EN[w.en];
+                if (manual) manual.forEach((x) => extras.push(x));
+                relaxedByEn.set(getWordKey(w), [...new Set(extras.map((x) => collapseSpacesVi(x)))]);
             }
-        });
-    }
 
-    function loadWordsForDeletion() {
-        const cat = document.getElementById('manage-category-select').value;
-        const list = document.getElementById('word-deletion-list');
-        list.innerHTML = '';
-
-        if (!cat) return;
-        const words = allVocabulary[cat];
-        if (words.length === 0) {
-            list.innerHTML = '<p style="text-align: center;">Chưa có từ nào.</p>';
-            return;
+            const byWordKey = new Map();
+            for (const w of allWords) {
+                const key = getWordKey(w);
+                const set = new Set();
+                for (const phrase of getViAcceptablePhrases(w.vi)) {
+                    const c = collapseSpacesVi(phrase);
+                    set.add(c);
+                    const stripped = stripOptionalClassifier(c);
+                    if (stripped) set.add(stripped);
+                }
+                for (const x of relaxedByEn.get(key) || []) {
+                    if (x) set.add(x);
+                }
+                byWordKey.set(key, set);
+            }
+            return byWordKey;
         }
 
-        words.forEach((w, i) => {
-            const div = document.createElement('div');
-            div.className = 'vocab-item';
-            div.innerHTML = `
-                <div>${w.en} ${w.icon} (${w.vn})</div>
-                <button class="delete-word-btn" onclick="confirmDeleteWord('${cat}', ${i})">Xóa</button>
-            `;
-            list.appendChild(div);
-        });
-    }
+        const VI_WRITE_ACCEPT_BY_EN = buildWriteViAcceptByEn(vocabularyData.flatMap((u) => u.words));
 
-    function confirmDeleteWord(cat, index) {
-        const word = allVocabulary[cat][index];
-        showModal('Xác nhận', `Bạn chắc chắn muốn xóa từ "${word.en}"?`, 'confirm', (yes) => {
-            if (yes) {
-                allVocabulary[cat].splice(index, 1);
-                saveVocabulary();
-                loadWordsForDeletion(); // Refresh list
+        function viWritingMatches(userInput, targetVi, wordKey) {
+            const user = collapseSpacesVi(String(userInput).replace(/\s*\/\s*/g, '/'));
+            if (!user) return false;
+
+            const userNoTone = stripVietnameseTones(user);
+            const userStripped = stripOptionalClassifier(user);
+
+            const fromCache = wordKey != null ? VI_WRITE_ACCEPT_BY_EN.get(wordKey) : null;
+            if (fromCache && fromCache.size) {
+                for (const cand of fromCache) {
+                    if (viCandidateMatchesUser(user, userNoTone, userStripped, cand)) return true;
+                }
             }
-        });
-    }
 
-    // --- View List ---
-    function viewVocabularyList() {
-        hideAllZones();
-        document.getElementById('vocab-list-zone').style.display = 'block';
-        document.getElementById('vocab-title').innerText = selectedCategoryName;
-        const container = document.getElementById('vocab-content');
-        container.innerHTML = '';
-        
-        currentVocabulary.forEach(w => {
-            const div = document.createElement('div');
-            div.className = 'vocab-item';
-            div.innerHTML = `<span>${w.en} ${w.icon}</span><span>${w.vn}</span>`;
-            container.appendChild(div);
-        });
-    }
+            const phrases = getViAcceptablePhrases(targetVi);
+            for (const phrase of phrases) {
+                if (viCandidateMatchesUser(user, userNoTone, userStripped, phrase)) return true;
+            }
+            return false;
+        }
 
-    // Start
-    initCategories();
-    resetMenu();
+        function App() {
+            const [activeUnit, setActiveUnit] = useState(1);
+            const [mode, setMode] = useState('learn'); // 'learn', 'quiz', 'write-en', 'write-vi'
+            const [quizQuestion, setQuizQuestion] = useState(null);
+            const [writingQueue, setWritingQueue] = useState([]);
+            const [writingIdx, setWritingIdx] = useState(0);
+            const [userInput, setUserInput] = useState('');
+            const [score, setScore] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+            const [isLocked, setIsLocked] = useState(false);
 
-</script>
+            // Gom tất cả từ vựng từ tất cả các Unit vào 1 mảng duy nhất để kiểm tra viết
+            const allWords = useMemo(() => vocabularyData.flatMap(u => u.words), []);
 
+            const writingQuestion =
+                writingQueue.length > 0
+                    ? writingQueue[Math.min(writingIdx, writingQueue.length - 1)]
+                    : null;
+
+            const currentWords = useMemo(() => {
+                return vocabularyData.find(u => u.unit === activeUnit).words;
+            }, [activeUnit]);
+
+            const speak = (text) => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const startQuiz = () => {
+                const randomWord = currentWords[Math.floor(Math.random() * currentWords.length)];
+                const others = vocabularyData
+                    .flatMap(u => u.words)
+                    .filter(w => getWordKey(w) !== getWordKey(randomWord))
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 3);
+                
+                const options = [randomWord, ...others].sort(() => 0.5 - Math.random());
+                setQuizQuestion({ correct: randomWord, options });
+                setFeedback(null);
+            };
+
+            useEffect(() => {
+                if (mode === 'quiz') startQuiz();
+                if (mode === 'write-en' || mode === 'write-vi') {
+                    setWritingQueue(shuffleArray(allWords));
+                    setWritingIdx(0);
+                    setUserInput('');
+                    setFeedback(null);
+                    setIsLocked(false);
+                }
+            }, [mode, activeUnit, allWords]);
+
+            const handleAnswer = (word) => {
+                if (getWordKey(word) === getWordKey(quizQuestion.correct)) {
+                    setScore(s => s + 10);
+                    setFeedback({ type: 'success', msg: 'Chính xác! Giỏi quá! 🎉' });
+                    speak(word.en);
+                    setTimeout(startQuiz, 1500);
+                } else {
+                    setFeedback({ type: 'error', msg: 'Thử lại nhé bé ơi! 💪' });
+                }
+            };
+
+            const checkWriting = () => {
+                if (isLocked || !writingQuestion) return;
+
+                const isCorrect =
+                    mode === 'write-en'
+                        ? userInput.toLowerCase().trim() === writingQuestion.en.toLowerCase().trim()
+                        : viWritingMatches(userInput, writingQuestion.vi, getWordKey(writingQuestion));
+
+                if (isCorrect) {
+                    setIsLocked(true);
+                    const total = allWords.length;
+                    const isLastInRound = writingIdx + 1 >= total;
+                    setScore(s => s + 20);
+                    setFeedback({
+                        type: 'success',
+                        msg: isLastInRound
+                            ? 'Tuyệt vời! Bé vừa làm xong cả danh sách từ! 🎊 Lượt mới sắp bắt đầu...'
+                            : 'Tuyệt vời! Bé viết đúng rồi! 🌟',
+                    });
+
+                    if (mode === 'write-en') speak(writingQuestion.en);
+                    setTimeout(() => {
+                        setIsLocked(false);
+                        setUserInput('');
+                        setFeedback(null);
+                        setWritingIdx((prev) => {
+                            const next = prev + 1;
+                            if (next >= total) {
+                                setWritingQueue(shuffleArray([...allWords]));
+                                return 0;
+                            }
+                            return next;
+                        });
+                    }, 2000);
+                } else {
+                    setFeedback({ type: 'error', msg: 'Chưa đúng rồi, bé kiểm tra lại nhé! ✍️' });
+                }
+            };
+
+            const writeTotal = writingQueue.length || 1;
+            const writeCompletedDisp =
+                isLocked && feedback?.type === 'success' ? writingIdx + 1 : writingIdx;
+            const writeBarPct = Math.min(100, (writeCompletedDisp / writeTotal) * 100);
+            const writeCurrentNum = Math.min(writingIdx + 1, writeTotal);
+            const writeBarClass = mode === 'write-vi' ? 'bg-orange-500' : 'bg-purple-500';
+            const writeTextClass = mode === 'write-vi' ? 'text-orange-600' : 'text-purple-600';
+
+            return (
+                <div className="min-h-screen pb-10">
+                    {/* Header */}
+                    <header className="bg-yellow-400 p-6 text-center shadow-lg rounded-b-3xl">
+                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
+                             🌟 BÉ HỌC TIẾNG ANH 🌟
+                        </h1>
+                        <div className="flex justify-center items-center gap-4 mt-2">
+                            <p className="text-yellow-900 font-semibold">Cùng vui học mỗi ngày!</p>
+                            <span className="bg-white text-orange-500 px-4 py-1 rounded-full font-bold shadow-sm">
+                                Điểm: {score}
+                            </span>
+                        </div>
+                    </header>
+
+                    {/* Navigation */}
+                    <div className="container mx-auto px-4 mt-6">
+                        {/* Unit Selector - Chỉ hiện ở chế độ Học và Quiz Unit */}
+                        {(mode === 'learn' || mode === 'quiz') && (
+                            <div className="flex flex-wrap justify-center gap-2 mb-8">
+                                {vocabularyData.map(u => (
+                                    <button 
+                                        key={u.unit}
+                                        onClick={() => setActiveUnit(u.unit)}
+                                        className={`px-4 py-2 rounded-full font-bold shadow-md transition-all ${activeUnit === u.unit ? 'unit-btn-active' : 'bg-white text-blue-500'}`}
+                                    >
+                                        Unit {u.unit}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Mode Switcher */}
+                        <div className="flex flex-wrap justify-center gap-3 mb-8">
+                            <button 
+                                onClick={() => setMode('learn')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-bold transition-all ${mode === 'learn' ? 'bg-blue-500 text-white shadow-lg scale-105' : 'bg-white text-blue-500 border-2 border-blue-500'}`}
+                            >
+                                📖 Học
+                            </button>
+                            <button 
+                                onClick={() => setMode('quiz')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-bold transition-all ${mode === 'quiz' ? 'bg-green-500 text-white shadow-lg scale-105' : 'bg-white text-green-500 border-2 border-green-500'}`}
+                            >
+                                🎮 Chơi
+                            </button>
+                            <button 
+                                onClick={() => setMode('write-en')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-bold transition-all ${mode === 'write-en' ? 'bg-purple-500 text-white shadow-lg scale-105' : 'bg-white text-purple-500 border-2 border-purple-500'}`}
+                            >
+                                ✍️ Viết Anh
+                            </button>
+                            <button 
+                                onClick={() => setMode('write-vi')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-bold transition-all ${mode === 'write-vi' ? 'bg-orange-500 text-white shadow-lg scale-105' : 'bg-white text-orange-500 border-2 border-orange-500'}`}
+                            >
+                                ✍️ Viết Việt
+                            </button>
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="mb-6 text-center">
+                            {mode === 'learn' || mode === 'quiz' ? (
+                                <h2 className="text-2xl font-bold text-gray-700">
+                                    Unit {activeUnit}: {vocabularyData.find(u => u.unit === activeUnit).title}
+                                </h2>
+                            ) : (
+                                <div className="max-w-xl mx-auto">
+                                    <h2 className="text-2xl font-bold text-gray-700 mb-2">
+                                        {mode === 'write-en' ? '✍️ Kiểm tra viết — Tiếng Anh' : '✍️ Kiểm tra viết — Tiếng Việt'}
+                                    </h2>
+                                    <p className="text-sm text-gray-500 mb-4">
+                                        Toàn bộ từ vựng · một lượt gồm <span className="font-semibold text-gray-700">{writeTotal}</span> câu (xáo trộn thứ tự)
+                                    </p>
+                                    <div className="flex items-center gap-4 mb-2">
+                                        <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+                                            <div
+                                                className={`${writeBarClass} h-full transition-all duration-500 ease-out`}
+                                                style={{ width: `${writeBarPct}%` }}
+                                            />
+                                        </div>
+                                        <span className={`font-bold ${writeTextClass} whitespace-nowrap text-lg tabular-nums`}>
+                                            Câu {writeCurrentNum}/{writeTotal}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-600">
+                                        Đã làm đúng <span className={`font-bold ${writeTextClass}`}>{writeCompletedDisp}</span> / {writeTotal} câu trong lượt này
+                                    </p>
+                                    <p className="text-xs text-gray-400 italic mt-1">Làm đúng hết {writeTotal} câu sẽ xáo trộn và bắt đầu lượt mới.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {mode === 'learn' && (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                                {currentWords.map((word) => (
+                                    <div 
+                                        key={getWordKey(word)}
+                                        onClick={() => speak(word.en)}
+                                        className="bg-white p-4 rounded-3xl shadow-md card-bounce cursor-pointer flex flex-col items-center border-b-4 border-blue-200"
+                                    >
+                                        <span className="text-5xl mb-3">{word.icon}</span>
+                                        <h3 className="text-xl font-bold text-blue-600 uppercase tracking-wide">{word.en}</h3>
+                                        <p className="text-gray-500 italic text-sm">{word.vi}</p>
+                                        <button className="mt-3 bg-blue-100 p-2 rounded-full">🔊</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {mode === 'quiz' && (
+                            <div className="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl border-t-8 border-green-400">
+                                {quizQuestion && (
+                                    <div className="text-center">
+                                        <p className="text-gray-500 mb-2 uppercase font-bold">Bé hãy chọn hình của từ:</p>
+                                        <div className="flex flex-wrap justify-center items-center gap-3 mb-8">
+                                            <h3 className="text-4xl font-black text-green-600 uppercase">{quizQuestion.correct.en}</h3>
+                                            <span className="text-6xl leading-none" title="Gợi ý nghĩa" aria-hidden="true">
+                                                {(quizQuestion.correct.icon && String(quizQuestion.correct.icon).trim()) || '❔'}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {quizQuestion.options.map((opt, i) => (
+                                                <button
+                                                    key={`${getWordKey(opt)}-${i}`}
+                                                    onClick={() => handleAnswer(opt)}
+                                                    className="quiz-option bg-gray-50 border-4 border-gray-100 hover:border-green-300 p-8 rounded-3xl text-6xl shadow-sm transition-all"
+                                                >
+                                                    {(opt.icon && String(opt.icon).trim()) || '❔'}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {(mode === 'write-en' || mode === 'write-vi') && (
+                            <div className="max-w-xl mx-auto bg-white p-10 rounded-3xl shadow-xl border-t-8 border-purple-400 text-center">
+                                {!writingQuestion ? (
+                                    <p className="text-gray-500 font-semibold">Đang chuẩn bị câu hỏi…</p>
+                                ) : (
+                                    <div>
+                                        <p className="text-gray-500 mb-4 font-bold uppercase tracking-widest">
+                                            {mode === 'write-en' ? 'Hãy viết từ này bằng Tiếng Anh:' : 'Hãy viết từ này bằng Tiếng Việt:'}
+                                        </p>
+                                        
+                                        <div className="bg-gray-100 py-8 px-4 rounded-2xl mb-8 flex flex-col items-center gap-3">
+                                            {(writingQuestion.icon && String(writingQuestion.icon).trim()) ? (
+                                                <span className="text-6xl leading-none" title="Gợi ý" aria-hidden="true">
+                                                    {String(writingQuestion.icon).trim()}
+                                                </span>
+                                            ) : null}
+                                            <h3 className="text-5xl font-black text-purple-600 break-words max-w-full">
+                                                {mode === 'write-en' ? writingQuestion.vi : writingQuestion.en}
+                                            </h3>
+                                            {mode === 'write-vi' ? (
+                                                <p className="text-sm text-gray-500 max-w-md">
+                                                    Icon gợi ý nghĩa khi nhiều từ cùng chữ tiếng Anh.
+                                                </p>
+                                            ) : null}
+                                        </div>
+
+                                        <input 
+                                            type="text"
+                                            value={userInput}
+                                            onChange={(e) => setUserInput(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && checkWriting()}
+                                            placeholder="Nhập câu trả lời..."
+                                            className="writing-input w-full p-5 text-2xl text-center font-bold border-4 border-gray-200 rounded-2xl mb-6 transition-all"
+                                            autoFocus
+                                        />
+
+                                        <button 
+                                            onClick={checkWriting}
+                                            disabled={isLocked}
+                                            className={`w-full text-white text-2xl font-bold py-4 rounded-2xl shadow-lg transition-transform active:scale-95 ${isLocked ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600'}`}
+                                        >
+                                            {isLocked ? 'Đang chuyển câu...' : 'Kiểm tra ✅'}
+                                        </button>
+                                        
+                                        <div className="mt-4 text-sm text-gray-400">
+                                            Có icon gợi ý khi cần phân biệt các từ trùng chữ tiếng Anh.
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Global Feedback Message */}
+                        {feedback && (
+                            <div className={`mt-8 max-w-md mx-auto p-4 rounded-2xl font-bold text-center text-lg animate-bounce shadow-md ${feedback.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                {feedback.msg}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="fixed bottom-0 w-full bg-white border-t p-2 text-center text-xs text-gray-400">
+                        Nội dung từ Unit 1-12 | Kiểm tra viết: một lượt qua toàn bộ từ (có icon gợi ý khi trùng chữ).
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
